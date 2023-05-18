@@ -15,27 +15,32 @@ export default PostScreen = ({navigation}) => {
             aspect: [4,3],
             quality: 1
         });
-        const source = {uri: result.assets[0].uri}
+        const source = {uri: result.assets[0].uri};
         console.log(source)
         setImage(source)
     };
 
-    const uploadImage = async () => {
+    const uploadImage = async (uri) => {
         setUploading(true);
-        try {
-          const response = await fetch(image.uri);
-          const blob = await response.blob();
-          const filename = image.uri.substring(image.uri.lastIndexOf('/') + 1);
-          const ref = firebase.storage().ref().child(filename);
-          await ref.put(blob);
-          setUploading(false);
-          Alert.alert('Photo uploaded!');
-          setImage(null);
-        } catch (error) {
-          console.log(error);
-          setUploading(false);
-          Alert.alert('Error', 'Failed to upload photo.');
-        }
+        const blob = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+              resolve(xhr.response);
+            };
+            xhr.onerror = function (e) {
+              console.log(e);
+              reject(new TypeError("Network request failed"));
+            };
+            xhr.responseType = "blob";
+            xhr.open("GET", uri, true);
+            xhr.send(null);
+          });
+
+          try {
+            const storageRef = ref(getSto)
+          } catch (error) {
+            alert(`error: ${error}`)
+          }
       };
     
       return (
