@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase/compat/app";
 import { storage } from '../firebase/config';
+import { uploadBytes } from 'firebase/storage';
 
 export default PostScreen = ({navigation}) => {
     const [image, setImage] = useState(null);
@@ -16,9 +17,12 @@ export default PostScreen = ({navigation}) => {
             aspect: [4,3],
             quality: 1
         });
-        const source = {uri: result.assets[0].uri};
+        if (!result.canceled) {
+          const source = {uri: result.assets[0].uri};
         console.log(source)
         setImage(source)
+        }
+        
     };
 
     const uploadImage = async (uri) => {
@@ -38,7 +42,8 @@ export default PostScreen = ({navigation}) => {
           });
 
           try {
-            const storageRef = ref(storage, `${firebase.storage().ref().child(image.uri.substring(image.uri.lastIndexOf('/')+1)).put(blob)})`)
+            const storageRef = ref(storage, `${firebase.storage().ref().child(image.uri.substring(image.uri.lastIndexOf('/')+1)).put(blob)})`);
+            const result = await uploadBytes(storageRef, blob);  
           } catch (error) {
             alert(`error: ${error}`)
           }
