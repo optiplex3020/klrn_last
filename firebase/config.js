@@ -1,5 +1,6 @@
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getStorage } from 'firebase/storage'
 
 const FirebaseKeys = {
     
@@ -15,7 +16,10 @@ const FirebaseKeys = {
   if (!getApps().length) {
     initializeApp(FirebaseKeys);
 }
+const app = getApps.length > 0 ? getApp() : initializeApp(FirebaseKeys)
 
+const storage = getStorage(app)
 
 export const auth = getAuth();
+export {storage }
 export default FirebaseKeys;
