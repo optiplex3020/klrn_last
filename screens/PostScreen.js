@@ -4,11 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase/compat/app";
 import { storage } from '../firebase/config';
-import { uploadBytes } from 'firebase/storage';
+import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
 
 export default PostScreen = ({navigation}) => {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -18,9 +19,21 @@ export default PostScreen = ({navigation}) => {
             quality: 1
         });
         if (!result.canceled) {
+          const uploadURL = await uploadImage(result.assets[0].uri);
+          setImage(uploadURL)
           const source = {uri: result.assets[0].uri};
-        console.log(source)
-        setImage(source)
+          console.log(source)
+          setImage(source)
+          uploadImage()
+          setInterval(() => {
+            setIsLoading(false);
+          }, 2000)
+        } else {
+          setImage(null)
+          uploadImage()
+          setInterval(() => {
+            setIsLoading(false);
+          }, 2000)
         }
         
     };
@@ -44,6 +57,8 @@ export default PostScreen = ({navigation}) => {
           try {
             const storageRef = ref(storage, `${firebase.storage().ref().child(image.uri.substring(image.uri.lastIndexOf('/')+1)).put(blob)})`);
             const result = await uploadBytes(storageRef, blob);  
+            blob.close();
+            return await getDownloadURL(storageRef)
           } catch (error) {
             alert(`error: ${error}`)
           }
