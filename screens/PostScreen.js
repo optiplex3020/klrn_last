@@ -3,6 +3,7 @@ import {View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert} fr
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase/compat/app";
+import { storage } from '../firebase/config';
 
 export default PostScreen = ({navigation}) => {
     const [image, setImage] = useState(null);
@@ -37,7 +38,7 @@ export default PostScreen = ({navigation}) => {
           });
 
           try {
-            const storageRef = ref(getSto)
+            const storageRef = ref(storage, `${firebase.storage().ref().child(image.uri.substring(image.uri.lastIndexOf('/')+1)).put(blob)})`)
           } catch (error) {
             alert(`error: ${error}`)
           }
