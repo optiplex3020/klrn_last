@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert} from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase/compat/app";
@@ -113,7 +113,7 @@ export default PostScreen = ({navigation}) => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={addPost}>
                     <Text style={{ fontWeight: "500"}}>
-                    Post
+                      Post
                     </Text>
                 </TouchableOpacity>
             </View>
