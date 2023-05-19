@@ -107,16 +107,69 @@ export default PostScreen = ({navigation}) => {
     
       return (
         <SafeAreaView style={styles.container}>
-          <TouchableOpacity style={styles.photo} onPress={pickImage}>
-            <Ionicons name="md-camera" size={32} color="#000" />
-          </TouchableOpacity>
-          <View style={{ marginHorizontal: 32, marginTop: 32, height: 150 }}>
-            {image && <Image source={image} style={{ width: '100%', height: '100%' }} />}
-          </View>
-          <TouchableOpacity onPress={uploadImage}>
-            <Text>Post</Text>
-          </TouchableOpacity>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Ionicons name="md-arrow-back"  size={24} color="#D8D9DB"/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={addPost}>
+                    <Text style={{ fontWeight: "500"}}>
+                    Post
+                    </Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput 
+                    autoFocus={true} 
+                    multiline={false} 
+                    numberOfLines={1} 
+                    placeholder="Titre"
+                    onChangeText={setTitle}
+                    value={title}/>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput 
+                    autoFocus={true} 
+                    multiline={true} 
+                    numberOfLines={1} 
+                    placeholder="Texte"
+                    onChangeText={setText}
+                    value={text}/>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput 
+                    autoFocus={true} 
+                    multiline={false} 
+                    numberOfLines={1} 
+                    placeholder="prix"
+                    onChangeText={prix => setPrix(prix.trim())} 
+                    value={prix}/>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput 
+                    autoFocus={true} 
+                    multiline={false} 
+                    numberOfLines={1} 
+                    placeholder="lieu"
+                    onChangeText={lieu => setLieu(lieu.trim())} 
+                    value={lieu}/>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput 
+                    autoFocus={true} 
+                    multiline={false} 
+                    numberOfLines={1} 
+                    placeholder="Categorie"
+                    onChangeText={categorie => setCategorie(categorie.trim())} 
+                    value={categorie}/>
+            </View>
+            <TouchableOpacity style={styles.photo} onPress={pickImages}>
+                <Ionicons name="md-camera" size={32} color="#000" />
+            </TouchableOpacity>
+            <View style={{ marginHorizontal: 32, marginTop: 32, height: 150 }} >
+                <Image source={{ uri: image }} style={{ width: "100%", height: "100%" }} />
+            </View>
         </SafeAreaView>
+
       );
     };   
 
