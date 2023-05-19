@@ -63,6 +63,47 @@ export default PostScreen = ({navigation}) => {
             alert(`error: ${error}`)
           }
       };
+
+      const addPost = async () => {
+        // Vérifier que toutes les données sont remplies avant d'ajouter le post
+        if (title && text && lieu && prix && categorie && image.uri) {
+          const { uri } = image;
+          const response = await fetch(uri);
+          const blob = await response.blob();
+      
+          // Stocker l'image sur Firebase Storage
+          const storageRef = firebase.storage().ref();
+          const imageRef = storageRef.child(`images/${new Date().getTime()}`);
+          await imageRef.put(blob);
+      
+          // Récupérer l'URL de l'image pour la stocker dans Firestore
+          const imageUrl = await imageRef.getDownloadURL();
+      
+          // Ajouter le post à Firestore avec l'URL de l'image
+          const db = firebase.firestore();
+          const newPostRef = db.collection("post").doc();
+      
+          newPostRef.set({
+            title: title,
+            text: text,
+            lieu: lieu,
+            prix: prix,
+            categorie: categorie,
+            id: newPostRef.id,
+            likes: 0,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            image: imageUrl
+          })
+          .then(() => {
+            console.log("Nouveau post ajouté avec succès !");
+          })
+          .catch((error) => {
+            console.error("Erreur lors de l'ajout du nouveau post :", error);
+          });
+        } else {
+          console.log("Tous les champs sont obligatoires !");
+        }
+      };      
     
       return (
         <SafeAreaView style={styles.container}>
