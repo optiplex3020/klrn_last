@@ -7,103 +7,95 @@ import { storage } from '../firebase/config';
 import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
 
 export default PostScreen = ({navigation}) => {
-    const [image, setImage] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4,3],
-            quality: 1
-        });
-        if (!result.canceled) {
-          const uploadURL = await uploadImage(result.assets[0].uri);
-          setImage(uploadURL)
-          const source = {uri: result.assets[0].uri};
-          console.log(source)
-          setImage(source)
-          uploadImage()
-          setInterval(() => {
-            setIsLoading(false);
-          }, 2000)
-        } else {
-          setImage(null)
-          uploadImage()
-          setInterval(() => {
-            setIsLoading(false);
-          }, 2000)
-        }
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
+  const [lieu, setLieu] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [prix, setPrix] = useState("");
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const pickImages = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri); // utiliser setImage plutôt que setImages pour stocker l'URI de l'image sélectionnée
+    }
+  };
+
+  uploadPhotoAsync = async (uri, filename) => {
         
-    };
+    return new Promise(async (res, rej) => {
+       const response = await fetch(uri);
+       const file = await response.blob();
 
-    const uploadImage = async (uri) => {
-        setUploading(true);
-        const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-              resolve(xhr.response);
-            };
-            xhr.onerror = function (e) {
-              console.log(e);
-              reject(new TypeError("Network request failed"));
-            };
-            xhr.responseType = "blob";
-            xhr.open("GET", uri, true);
-            xhr.send(null);
-          });
+       let upload = firebase
+           .storage()
+           .ref(filename)
+           .put(file);
 
-          try {
-            const storageRef = ref(storage, `${firebase.storage().ref().child(image.uri.substring(image.uri.lastIndexOf('/')+1)).put(blob)})`);
-            const result = await uploadBytes(storageRef, blob);  
-            blob.close();
-            return await getDownloadURL(storageRef)
-          } catch (error) {
-            alert(`error: ${error}`)
-          }
-      };
+       upload.on(
+           "state_changed",
+           snapshot => {},
+           err => { 
+               rej(err);
+           },
+           async () => {
+               const url = await upload.snapshot.ref.getDownloadURL();
+               res(url);
+           }
+        );
+      }
+    );
+  };
 
-      const addPost = async () => {
-        // Vérifier que toutes les données sont remplies avant d'ajouter le post
-        if (title && text && lieu && prix && categorie && image.uri) {
-          const { uri } = image;
-          const response = await fetch(uri);
-          const blob = await response.blob();
-      
-          // Stocker l'image sur Firebase Storage
-          const storageRef = firebase.storage().ref();
-          const imageRef = storageRef.child(`images/${new Date().getTime()}`);
-          await imageRef.put(blob);
-      
-          // Récupérer l'URL de l'image pour la stocker dans Firestore
-          const imageUrl = await imageRef.getDownloadURL();
-      
-          // Ajouter le post à Firestore avec l'URL de l'image
-          const db = firebase.firestore();
-          const newPostRef = db.collection("post").doc();
-      
-          newPostRef.set({
-            title: title,
-            text: text,
-            lieu: lieu,
-            prix: prix,
-            categorie: categorie,
-            id: newPostRef.id,
-            likes: 0,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            image: imageUrl
-          })
-          .then(() => {
-            console.log("Nouveau post ajouté avec succès !");
-          })
-          .catch((error) => {
-            console.error("Erreur lors de l'ajout du nouveau post :", error);
-          });
-        } else {
-          console.log("Tous les champs sont obligatoires !");
-        }
-      };      
+  const addPost = async ({title, text, lieu, prix, categorie, image, localUri}) => {
+    // Vérifier que toutes les données sont remplies avant d'ajouter le post
+    if (title && text && lieu && prix && categorie) {
+      const { uri } = image;
+      const response = await fetch(uri);
+      const blob = await response.blob();
+  
+      // Stocker l'image sur Firebase Storage
+      const storageRef = firebase.storage().ref();
+      const imageRef = storageRef.child(`images/${new Date().getTime()}`);
+      await imageRef.put(blob);
+  
+      // Récupérer l'URL de l'image pour la stocker dans Firestore
+      const imageUrl = await imageRef.getDownloadURL();
+  
+      // Ajouter le post à Firestore avec l'URL de l'image
+      const db = firebase.firestore();
+      const newPostRef = db.collection("post").doc();
+  
+      newPostRef.set({
+        title: title,
+        text: text,
+        lieu: lieu,
+        prix: prix,
+        categorie: categorie,
+        id: newPostRef.id,
+        likes: 0,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        image: imageUrl
+      })
+      .then(() => {
+        console.log("Nouveau post ajouté avec succès !");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'ajout du nouveau post :", error);
+      });
+    } else {
+      console.log("Tous les champs sont obligatoires !");
+    }
+  };      
     
       return (
         <SafeAreaView style={styles.container}>
