@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from "expo-image-picker";
 import firebase from "firebase/compat/app";
-import { storage } from '../firebase/config';
-import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
+import * as ImagePicker from "expo-image-picker";
 
-export default PostScreen = ({navigation}) => {
 
+export default HomeScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [lieu, setLieu] = useState("");
@@ -17,158 +17,134 @@ export default PostScreen = ({navigation}) => {
   const [uploading, setUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const pickImages = async () => {
+  const addPost = async () => {
+    const remoteUri = await uploadPhotoAsync(image, `photos/${Date.now()}.jpg`);
+
+    firebase.firestore()
+      .collection("post")
+      .add({
+        title,
+        text,
+        lieu,
+        categorie,
+        likes: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        image: remoteUri
+      })
+      .then(ref => {
+        console.log("Post ajouté :", ref);
+      })
+      .catch(error => {
+        console.error("Erreur lors de l'ajout du post :", error);
+      });
+
+    // Remarque : Je ne suis pas sûr de ce que vous essayez de faire avec cette ligne de code suivante,
+    // elle semble inutile ici
+  };
+
+  const uploadPhotoAsync = async (uri, filename) => {
+    return new Promise(async (res, rej) => {
+      const response = await fetch(uri);
+      const file = await response.blob();
+
+      let upload = firebase
+        .storage()
+        .ref(filename)
+        .put(file);
+
+      upload.on(
+        "state_changed",
+        snapshot => {},
+        err => { 
+          rej(err);
+        },
+        async () => {
+          const url = await upload.snapshot.ref.getDownloadURL();
+          res(url);
+        }
+      );
+    });
+  };
+
+  const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
       allowsEditing: true,
       aspect: [4, 3],
     });
 
     if (!result.cancelled) {
-      setImage(result.uri); // utiliser setImage plutôt que setImages pour stocker l'URI de l'image sélectionnée
+      setImage(result.uri);
     }
   };
 
-  uploadPhotoAsync = async (uri, filename) => {
-        
-    return new Promise(async (res, rej) => {
-       const response = await fetch(uri);
-       const file = await response.blob();
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="md-arrow-back" size={24} color="#D8D9DB" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={addPost}>
+          <Text style={{ fontWeight: "500" }}>Post</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          multiline={false}
+          style={{ flex: 1 }}
+          placeholder="Titre de votre plat"
+          onChangeText={title => setTitle(title.trim())}
+          value={title}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          autoFocus={true}
+          multiline={true}
+          style={{ flex: 1 }}
+          placeholder="Description"
+          onChangeText={text => setText(text.trim())}
+          value={text}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          autoFocus={true}
+          multiline={true}
+          style={{ flex: 1 }}
+          placeholder="Catégorie"
+          onChangeText={categorie => setCategorie(categorie.trim())}
+          value={categorie}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          autoFocus={true}
+          style={{ flex: 1 }}
+          placeholder="Indiquer le lieu"
+          onChangeText={lieu => setLieu(lieu.trim())}
+          value={lieu}
+        />
+      </View>
 
-       let upload = firebase
-           .storage()
-           .ref(filename)
-           .put(file);
+      <TouchableOpacity style={styles.photo} onPress={pickImage}>
+        <Ionicons name="md-camera" size={32} color="#000" />
+      </TouchableOpacity>
 
-       upload.on(
-           "state_changed",
-           snapshot => {},
-           err => { 
-               rej(err);
-           },
-           async () => {
-               const url = await upload.snapshot.ref.getDownloadURL();
-               res(url);
-           }
-        );
-      }
-    );
-  };
-
-  const addPost = async ({title, text, lieu, prix, categorie, image, localUri}) => {
-    // Vérifier que toutes les données sont remplies avant d'ajouter le post
-    if (title && text && lieu && prix && categorie) {
-      const { uri } = image;
-      const response = await fetch(uri);
-      const blob = await response.blob();
-  
-      // Stocker l'image sur Firebase Storage
-      const storageRef = firebase.storage().ref();
-      const imageRef = storageRef.child(`images/${new Date().getTime()}`);
-      await imageRef.put(blob);
-  
-      // Récupérer l'URL de l'image pour la stocker dans Firestore
-      const imageUrl = await imageRef.getDownloadURL();
-  
-      // Ajouter le post à Firestore avec l'URL de l'image
-      const db = firebase.firestore();
-      const newPostRef = db.collection("post").doc();
-  
-      newPostRef.set({
-        title: title,
-        text: text,
-        lieu: lieu,
-        prix: prix,
-        categorie: categorie,
-        id: newPostRef.id,
-        likes: 0,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        image: imageUrl
-      })
-      .then(() => {
-        console.log("Nouveau post ajouté avec succès !");
-      })
-      .catch((error) => {
-        console.error("Erreur lors de l'ajout du nouveau post :", error);
-      });
-    } else {
-      console.log("Tous les champs sont obligatoires !");
-    }
-  };      
-    
-      return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="md-arrow-back"  size={24} color="#D8D9DB"/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={addPost}>
-                    <Text style={{ fontWeight: "500"}}>
-                      Post
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={false} 
-                    numberOfLines={1} 
-                    placeholder="Titre"
-                    onChangeText={setTitle}
-                    value={title}/>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={true} 
-                    numberOfLines={1} 
-                    placeholder="Texte"
-                    onChangeText={setText}
-                    value={text}/>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={false} 
-                    numberOfLines={1} 
-                    placeholder="prix"
-                    onChangeText={prix => setPrix(prix.trim())} 
-                    value={prix}/>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={false} 
-                    numberOfLines={1} 
-                    placeholder="lieu"
-                    onChangeText={lieu => setLieu(lieu.trim())} 
-                    value={lieu}/>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={false} 
-                    numberOfLines={1} 
-                    placeholder="Categorie"
-                    onChangeText={categorie => setCategorie(categorie.trim())} 
-                    value={categorie}/>
-            </View>
-            <TouchableOpacity style={styles.photo} onPress={pickImages}>
-                <Ionicons name="md-camera" size={32} color="#000" />
-            </TouchableOpacity>
-            <View style={{ marginHorizontal: 32, marginTop: 32, height: 150 }} >
-                <Image source={{ uri: image }} style={{ width: "100%", height: "100%" }} />
-            </View>
-        </SafeAreaView>
-
-      );
-    };   
+      {image && (
+        <View style={{ marginHorizontal: 32, marginTop: 32, height: 250 }}>
+          <Image source={{ uri: image }} style={{ width: "100%", height: "100%" }} />
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create ({
     container: {
         flex: 1,
         marginBottom: 12
+       
     },
     header: {
         flexDirection: "row",
@@ -179,8 +155,40 @@ const styles = StyleSheet.create ({
         borderBottomColor: "#D8D9DB"
     },
     inputContainer: {
-        margin: 32,
+        margin: -5,
+        marginTop: 40,
+        flexDirection: "row",
+        marginLeft: 35,
+        marginRight: 40,
+        borderColor: "grey",
+        borderWidth: 0.5
+
+    },
+    inputContainer2: {
+        marginLeft: 93,
         flexDirection: "row"
+    },
+    inputContainer3: {
+        marginLeft: 93,
+        marginBottom: 56,
+        height: 160,
+        flexDirection: "row"
+    },
+    inputContainer4: {
+        margin: 2,
+        marginLeft: 93,
+        marginBottom: 76,
+        height: 222,
+        flexDirection: "row"
+    },
+    TextInputContainer: {
+        width: '100%'
+    },
+    description: {
+        fontWeight: 'bold'
+    },
+    predefinedPlacesDescription: {
+        color: '#1faadb'
     },
     avatar: {
         width: 48,
