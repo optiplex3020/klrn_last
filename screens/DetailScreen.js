@@ -1,9 +1,7 @@
 import React, {useEffect, useRef, useState, useContext} from 'react'
 import {ImageBackground, SafeAreaView, View,Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import firebase from "firebase/compat/app";
 import {UserContext} from '../Context/UserContext'
-import {CartContext} from '../Context/CartContext'
 import NumericInput from 'react-native-numeric-input';
 import { Entypo } from '@expo/vector-icons';
 
@@ -11,23 +9,7 @@ export default DetailScreen = ({route, navigation}) => {
 
   const [user, setUser] = useContext(UserContext);
   const [value, setValue] = useState(0);
-  //const data = useContext(CartContext);
-  //console.log(data);
-
-  const {dispatch} = useContext(CartContext)
-  console.log(dispatch)
-  const AddToCartt = (item) => {
-    id: item.uid, item;
-    console.log(item);
-  }
-  let Item;
-  const addToCart = (item) => {
-    uid = item.uid
-    Item = item;
-    Item['qty']=1;
-    Item['TotalItemPrice']= Item.qty*Item.price;
-    firebase.collection('Cart').doc(item.uid).set(Item)
-  };
+ 
 
     const {item} = route.params;
 
@@ -119,7 +101,7 @@ export default DetailScreen = ({route, navigation}) => {
               Prix Total
             </Text>
           </View>
-          <TouchableOpacity onPress={() => dispatch({ type: 'ADD_TO_CART', payload: { id: item.ItemID, item } })} style={style.bookNowBtn}>
+          <TouchableOpacity style={style.bookNowBtn}>
             <Text style={{color: "#fff"}}>Ajouter au panier</Text>  
           </TouchableOpacity>
         </View>

@@ -26,6 +26,7 @@ export default HomeScreen = ({ navigation }) => {
         title,
         text,
         lieu,
+        prix,
         categorie,
         likes: [],
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -89,43 +90,50 @@ export default HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.inputContainer}>
-        <TextInput
-          multiline={false}
-          style={{ flex: 1 }}
-          placeholder="Titre de votre plat"
-          onChangeText={title => setTitle(title.trim())}
-          value={title}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          autoFocus={true}
-          multiline={true}
-          style={{ flex: 1 }}
-          placeholder="Description"
-          onChangeText={text => setText(text.trim())}
-          value={text}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          autoFocus={true}
-          multiline={true}
-          style={{ flex: 1 }}
-          placeholder="Catégorie"
-          onChangeText={categorie => setCategorie(categorie.trim())}
-          value={categorie}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          autoFocus={true}
-          style={{ flex: 1 }}
-          placeholder="Indiquer le lieu"
-          onChangeText={lieu => setLieu(lieu.trim())}
-          value={lieu}
-        />
-      </View>
+            <TextInput 
+              autoFocus={true} 
+              multiline={false} 
+              numberOfLines={1} 
+              placeholder="Titre"
+              onChangeText={setTitle}
+              value={title}/>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput 
+              autoFocus={true} 
+              multiline={true} 
+              numberOfLines={1} 
+              placeholder="Texte"
+              onChangeText={setText}
+              value={text}/>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput 
+              autoFocus={true} 
+              multiline={false} 
+              numberOfLines={1} 
+              placeholder="prix"
+              onChangeText={prix => setPrix(prix.trim())} 
+              value={prix}/>
+          </View>
+          <View style={styles.inputContainer}>
+              <TextInput 
+                  autoFocus={true} 
+                  multiline={false} 
+                  numberOfLines={1} 
+                  placeholder="lieu"
+                  onChangeText={lieu => setLieu(lieu.trim())} 
+                  value={lieu}/>
+          </View>
+          <View style={styles.inputContainer}>
+              <TextInput 
+                  autoFocus={true} 
+                  multiline={false} 
+                  numberOfLines={1} 
+                  placeholder="Categorie"
+                  onChangeText={categorie => setCategorie(categorie.trim())} 
+                  value={categorie}/>
+          </View>
 
       <TouchableOpacity style={styles.photo} onPress={pickImage}>
         <Ionicons name="md-camera" size={32} color="#000" />
