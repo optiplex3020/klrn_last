@@ -112,9 +112,8 @@ export default HomeScreen = ({navigation}) => {
           }
         });
       }, []);
-    return (
+    return ( 
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator="false">
               <View style={styles.subheader}>
                 <Text style={styles.hi}>Bonjour, {username}</Text>
                 <SearchComponent/>
@@ -165,7 +164,7 @@ export default HomeScreen = ({navigation}) => {
                     </View>
                 )}
             />  
-            </ScrollView>
+            
             
         </View>
         );
