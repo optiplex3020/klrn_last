@@ -4,11 +4,46 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {UserContext} from '../Context/UserContext'
 import NumericInput from 'react-native-numeric-input';
 import { Entypo } from '@expo/vector-icons';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 export default DetailScreen = ({route, navigation}) => {
 
   const [user, setUser] = useContext(UserContext);
   const [value, setValue] = useState(0);
+
+  const addToCart = (item) => {
+    if (user) {
+      const { id, title, lieu, prix } = item;
+      const cartRef = firebase.firestore().collection('users').doc(user.uid).collection('cart');
+  
+      cartRef
+        .doc(id)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            // L'article existe déjà dans le panier, mise à jour de la quantité
+            const newQuantity = doc.data().quantity + 1;
+            cartRef.doc(id).update({ quantity: newQuantity });
+          } else {
+            // Ajouter un nouvel article au panier
+            cartRef.doc(id).set({
+              id,
+              title,
+              lieu,
+              prix,
+              quantity: 1,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur lors de l'ajout de l'article au panier :", error);
+        });
+    } else {
+      // L'utilisateur n'est pas connecté, gérer cette situation selon votre logique
+    }
+  };
+  
  
 
     const {item} = route.params;
@@ -20,8 +55,6 @@ export default DetailScreen = ({route, navigation}) => {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: "#f7f7f7"}}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* item image */}
-  
           <View style={style.backgroundImageContainer}>
             <ImageBackground style={style.backgroundImage} source={{uri:item.image}}>
               <View style={style.header}>
@@ -37,8 +70,6 @@ export default DetailScreen = ({route, navigation}) => {
                 </View>
               </View>
             </ImageBackground>
-  
-            {/* Virtual Tag View */}
             <View style={style.virtualTag}>
               <Text style={{fontSize: 20, fontWeight: 'bold'}}>{item.title}</Text>
               <View style={style.location}>
@@ -49,19 +80,10 @@ export default DetailScreen = ({route, navigation}) => {
               </View>
             </View>
           </View>
-  
           <View style={style.detailsContainer}>
-            {/* Name and rating view container */}
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              
-            </View>
-  
-            {/* Location text */}
             <Text style={{fontSize: 16, color: "#66666"}}>
               {item.lieu}
             </Text>
-  
-            {/* Facilities container */}
             <View style={{flexDirection: 'row', marginTop: 20}}>
               <NumericInput 
                 value={value}
@@ -78,8 +100,6 @@ export default DetailScreen = ({route, navigation}) => {
             <Text style={{marginTop: 20, color: "#666666"}}>
               {item.text}
             </Text>
-  
-            {/* Interior list */}
             <FlatList
               contentContainerStyle={{marginTop: 20}}
               horizontal
@@ -88,8 +108,6 @@ export default DetailScreen = ({route, navigation}) => {
               data={item.interiors}
               renderItem={({item}) => <InteriorCard interior={item} />}
             />
-  
-            {/* footer container */}
           </View>
         </ScrollView>
         <View style={style.footer}>
@@ -101,9 +119,10 @@ export default DetailScreen = ({route, navigation}) => {
               Prix Total
             </Text>
           </View>
-          <TouchableOpacity style={style.bookNowBtn}>
-            <Text style={{color: "#fff"}}>Ajouter au panier</Text>  
+          <TouchableOpacity style={style.bookNowBtn} onPress={() => addToCart(item)}>
+            <Text style={{ color: "#fff" }}>Ajouter au panier</Text>
           </TouchableOpacity>
+
         </View>
       </SafeAreaView>
     );

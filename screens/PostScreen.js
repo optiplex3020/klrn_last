@@ -19,11 +19,14 @@ export default HomeScreen = ({ navigation }) => {
 
   const addPost = async () => {
     const remoteUri = await uploadPhotoAsync(image, `photos/${Date.now()}.jpg`);
+    const db = firebase.firestore();
+    const newPostRef = db.collection("post").doc();
 
     firebase.firestore()
       .collection("post")
       .add({
         title,
+        id: newPostRef.id,
         text,
         lieu,
         prix,
@@ -33,7 +36,7 @@ export default HomeScreen = ({ navigation }) => {
         image: remoteUri
       })
       .then(ref => {
-        console.log("Post ajouté :", ref);
+        console.log("Post ajouté avec succès:");
       })
       .catch(error => {
         console.error("Erreur lors de l'ajout du post :", error);
