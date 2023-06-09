@@ -30,8 +30,9 @@ import { UserContext } from '../Context/UserContext';
 
 export default RecipeScreen = ({navigation}) => {
 
-    const cartItems = useSelector(state => state.cart.items);
-  const totalPrice = useSelector(state => state.cart.totalPrice);
+  const { totalPrice, } = useContext(CartContext);
+
+  const cartItems = useSelector(state => state.cart.items);
 
   const renderItem = ({ item }) => (
     <View>
