@@ -16,7 +16,7 @@ export const CartReducer = (state, action) => {
                 console.log('Ce produit est déja dans votre panier.');
                 return state;
             } else {
-                item = action.item;
+                item = action.item; 
                 item['qty'] = 1;
                 item['TotalItemPrice'] = item.ItemPrice * item.qty;
                 updatedQty = totalQty + 1;
