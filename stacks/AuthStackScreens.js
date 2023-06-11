@@ -12,8 +12,8 @@ export default AuthStackScreens = () => {
     return (
         <AuthStack.Navigator screenOptions={{headerShown: false}}>
             <AuthStack.Screen name="First" component={FirstScreen} />
-            <AuthStack.Screen name="Login" component={LoginScreen} />
             <AuthStack.Screen name="Register" component={RegisterScreen} />
+            <AuthStack.Screen name="Login" component={LoginScreen} />
             <AuthStack.Screen name="Changepw" component={ChangepwScreen} />
         </AuthStack.Navigator>
     )

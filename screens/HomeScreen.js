@@ -51,7 +51,7 @@ export default HomeScreen = ({navigation}) => {
     });
     const getPosts = async () => {
         setLoading(true);
-        const snapshot = await refPosts.orderBy('timestamp', 'desc').limit('10').get();
+        const snapshot = await refPosts.orderBy('title', 'desc').limit('10').get();
         if (!snapshot.empty) {
             let newPosts = [];
             setLastDoc(snapshot.docs[snapshot.docs.length -1]);

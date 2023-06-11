@@ -49,7 +49,7 @@ export default FirstScreen = ({navigation}) => {
               paddingBottom: 40,
             }}>
             {/* button */}
-            <Pressable onPress={() => navigation.navigate('Register')}>
+            <Pressable onPress={() => navigation.navigate('Login')}>
               <View style={style.btn}>
                 <Text style={{color: 'white'}}>Commancer</Text>
               </View>
