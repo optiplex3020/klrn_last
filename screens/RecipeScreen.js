@@ -6,8 +6,6 @@ import { CartContext } from '../Context/CartContext';
 import { ic_add } from 'react-icons-kit/md/ic_add'
 import { ic_remove } from 'react-icons-kit/md/ic_remove'
 import { iosTrashOutline } from 'react-icons-kit/ionicons/iosTrashOutline'
-import { useStripe } from '@stripe/stripe-react-native';
-import { UserContext } from '../Context/UserContext';
 
 {/*<React.Fragment>
             <main className="cart">
@@ -27,31 +25,63 @@ import { UserContext } from '../Context/UserContext';
             </main>
           </React.Fragment> */ }
 
-
 export default RecipeScreen = ({navigation}) => {
 
-  const { totalPrice, } = useContext(CartContext);
+  const { shoppingCart, dispatch, totalPrice, totalQty } = useContext(CartContext);
+  return(
+    <View style={{flex:1}}>
+      { shoppingCart.length == 0 ? 
+        <Text style={styles.textco} >Aucun article dans votre panier or slow internet causing trouble (Refresh the page) or you are not logged in</Text>
+           
+        : null  }
+      {shoppingCart.map(cart => (
+              <View style={{flex:1}} key={cart.ProductID}>
 
-  const cartItems = useSelector(state => state.cart.items);
+                  <View>
+                      <Image source={cart.ProductImg} alt="not found" />
+                  </View>
 
-  const renderItem = ({ item }) => (
-    <View>
-      <Text>{item.name}</Text>
-      <Text>{item.price}</Text>
+                  <View>{cart.ProductName}</View>
+
+                  <View>{cart.ProductPrice}</View>
+
+                  <TouchableOpacity onPress={() => dispatch({ type: 'INC', id: cart.ProductID, cart })}>
+                      <Icon icon={ic_add} size={24} />
+                  </TouchableOpacity>
+
+                  <Text>{cart.qty}</Text>
+
+                  <TouchableOpacity onPress={() => dispatch({ type: 'DEC', id: cart.ProductID, cart })}>
+                      <Icon icon={ic_remove} size={24} />
+                  </TouchableOpacity>
+
+                  <View>
+                      <Text>Rs {cart.TotalProductPrice}.00</Text> 
+                  </View>
+
+                  <TouchableOpacity onPress={() => dispatch({ type: 'DELETE', id: cart.ProductID, cart })}>
+                      <Icon icon={iosTrashOutline} size={24} />
+                  </TouchableOpacity>
+              </View>
+          ))
+          }
+          {shoppingCart.length > 0 ? 
+              <View>
+                  <View>
+                      <Text>Cart-Summary</Text> 
+                  </View>
+                  <View>
+                      <Text>Total Price</Text>
+                      <Text>{totalPrice}</Text>
+                  </View>
+                  <View>
+                      <Text>Total Qty</Text>
+                      <Text>{totalQty}</Text>
+                  </View>
+              </View>: null} 
     </View>
-  );
-
-  return (
-    <View>
-      <FlatList
-        data={cartItems}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-      <Text>Total: {totalPrice}</Text>
-    </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
     textco: {

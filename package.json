@@ -16,6 +16,7 @@
     "@react-navigation/bottom-tabs": "^6.4.1",
     "@react-navigation/native": "^6.0.14",
     "@react-navigation/stack": "^6.3.5",
+    "@reduxjs/toolkit": "^1.9.5",
     "@stripe/stripe-react-native": "0.23.3",
     "axios": "^1.2.0",
     "base-64": "^1.0.0",
@@ -53,8 +54,7 @@
     "react-router-dom": "^6.4.5",
     "redux": "^4.2.0",
     "shared-element": "^1.0.1",
-    "styled-components": "^5.3.6",
-    "undefined": "reduxjs/toolkit"
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
