@@ -15,7 +15,7 @@ export default DetailScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
 
   const handleAddToCart = (item) => {
-    dispatch(addToCart(item));
+    dispatch(addToCart({ ...item, quantity: 1 }));
   };
 
     const {item} = route.params;

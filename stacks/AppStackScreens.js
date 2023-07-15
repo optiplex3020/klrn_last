@@ -181,7 +181,7 @@ export default AppStackScreens = () => {
  
     return (
         <AppStack.Navigator screenOptions={{headerShown: false}}>
-            {user.isLoggedIn ? (
+            {user.isLoggedIn  ? (
                 <>
                     <AppStack.Screen name="Main" component={BottomTabNavigator}/>
                     <AppStack.Screen name="Detail" component={DetailScreen} sharedElements={(route) => {
