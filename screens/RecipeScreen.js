@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
-
+import { ThemeContext } from '../Context/ThemeContext';
 import { useStripe } from '@stripe/stripe-react-native';
 
 export default RecipeScreen = ({ navigation }) => {
+  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
   const [paymentSheetOpen, setPaymentSheetOpen] = useState(false); // État de l'affichage du processus de paiement
+
+  const { theme } = useContext(ThemeContext);
 
   const fetchPaymentSheetParams = async () => {
     // Effectuez votre appel API pour récupérer les paramètres du paiement (paymentIntent, ephemeralKey, customer, etc.)
@@ -65,27 +69,26 @@ export default RecipeScreen = ({ navigation }) => {
     initializePaymentSheet();
   }, []);
 
-
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
 
-  const handleIncrement = (itemId) => {
-    dispatch(incrementQuantity(itemId));
+  const handleIncrement = (item) => {
+    dispatch(incrementQuantity(item));
   };
 
-  const handleDecrement = (itemId) => {
-    dispatch(decrementQuantity(itemId));
+  const handleDecrement = (item) => {
+    dispatch(decrementQuantity(item));
   };
 
   const handleRemove = (itemId) => {
     dispatch(removeFromCart(itemId));
   };
 
-  let totalPrice = 0;
-  cartItems.forEach(item => {
+  let totalPrice = cartItems.reduce((total, item) => {
     const itemTotalPrice = item.prix * item.quantity;
-    totalPrice += itemTotalPrice;
-  });
+    return total + itemTotalPrice;
+  }, 0);
+  
 
   const renderItem = ({ item }) => (
     <View style={styles.productContainer}>
@@ -94,16 +97,16 @@ export default RecipeScreen = ({ navigation }) => {
         style={styles.productImage}
       />
       <View style={styles.productInfoContainer}>
-        <Text>{item.title}</Text>
-        <Text>{item.prix}€</Text>
+        <Text style={[styles.productTitle]}>{item.title}</Text>
+        <Text style={[styles.productPrice]}>{item.price}€</Text>
       </View>
       <View style={styles.quantityContainer}>
-      <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.id)}>
-          <Text>-</Text>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item)}>
+          <Text style={[styles.quantityButtonText]}>-</Text>
         </TouchableOpacity>
-        <Text>{item.quantity}</Text>
-        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.id)}>
-          <Text>+</Text>
+        <Text style={[styles.quantityText]}>{item.quantity}</Text>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item)}>
+          <Text style={[styles.quantityButtonText]}>+</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
@@ -113,9 +116,9 @@ export default RecipeScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.main}>
+    <View style={[styles.main, isDarkMode && styles.mainDark]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Panier</Text>
+        <Text style={[styles.title]}>Panier</Text>
       </View>
       <FlatList
         data={cartItems}
@@ -123,22 +126,24 @@ export default RecipeScreen = ({ navigation }) => {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.flatListContainer}
       />
-      <Text>Prix total: {totalPrice}€</Text>
+      <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
+      {loading && (
+        <TouchableOpacity style={[styles.paymentButton]} onPress={openPaymentSheet}>
+          <Text style={[styles.paymentButtonText]}>Payer</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  textco: {
-    marginTop: 350,
-    marginLeft: 25,
-    marginRight: 25,
-    fontWeight: "bold"
-  },
   main: {
     flex: 1,
-    alignContent: "center",
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
+  },
+  mainDark: {
+    backgroundColor: '#000',
   },
   header: {
     backgroundColor: '#fff',
@@ -150,16 +155,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontWeight: 'bold',
     fontSize: 17
-  },
-  img: {
-    width: 70, 
-    height: 70, 
-    borderRadius: 15
-  },
-  lign: {
-    width: '80%',
-    height: '10%',
-    marginBottom: '20%'
   },
   flatListContainer: {
     paddingVertical: 10
@@ -176,16 +171,43 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 15
   },
-  quantityButton: {
-    marginHorizontal: 20
-  },
   productInfoContainer: {
     marginLeft: 30
+  },
+  productTitle: {
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  productPrice: {
+    fontSize: 14
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 10,
     width: '100%'
+  },
+  quantityButton: {
+    marginHorizontal: 20
+  },
+  quantityText: {
+    fontSize: 16
+  },
+  quantityButtonText: {
+    fontSize: 18
+  },
+  totalPrice: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  paymentButton: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 5
+  },
+  paymentButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16
   }
 });

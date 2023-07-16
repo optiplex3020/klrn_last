@@ -13,17 +13,16 @@ export default function SearchComponent() {
 
     const handleSearch = () => {
         firebase
-            .firestore()
-            .collection('post')
-            .where('title', '>=', searchQuery)
-            .get()
-            .then(querySnapshot => {
-                const results = querySnapshot.docs.map(doc => doc.data());
-                setSearchResults(results);
-            });
-    };
-
-   
+          .firestore()
+          .collection('post')
+          .where('title', '>=', searchQuery)
+          .get()
+          .then(querySnapshot => {
+            const results = querySnapshot.docs.map(doc => doc.data());
+            setSearchResults(results);
+          });
+      };
+    
     return (
         <View style={styles.container}>
             <View style={styles.search}>
@@ -39,11 +38,12 @@ export default function SearchComponent() {
             </View>
             <View>
 
-                <FlatList
-                    data={searchResults}
-                    renderItem={({ item }) => <Text>{item.title}</Text>}
-                    keyExtractor={item => item.id}
-                />
+            <FlatList
+  data={searchResults}
+  renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+  keyExtractor={item => item.id}
+/>
+
             </View>
         </View>
     )
