@@ -6,14 +6,14 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload;
-      item.quantity = 1; // Définit la quantité par défaut à 1 lors de l'ajout au panier
+      item.quantity = 1;
       state.push(item);
     },
     incrementQuantity: (state, action) => {
-      const item = action.payload;
-      const existingItem = state.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        existingItem.quantity += 1;
+      const itemId = action.payload;
+      const item = state.find((cartItem) => cartItem.id === itemId);
+      if (item) {
+        item.quantity += 1;
       }
     },
     decrementQuantity: (state, action) => {
@@ -32,6 +32,7 @@ const cartSlice = createSlice({
     },
   },
 });
+
 
 export const {
   addToCart,

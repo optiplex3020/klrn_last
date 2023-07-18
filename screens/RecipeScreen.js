@@ -13,8 +13,6 @@ export default RecipeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [paymentSheetOpen, setPaymentSheetOpen] = useState(false); // État de l'affichage du processus de paiement
 
-  const { theme } = useContext(ThemeContext);
-
   const fetchPaymentSheetParams = async () => {
     // Effectuez votre appel API pour récupérer les paramètres du paiement (paymentIntent, ephemeralKey, customer, etc.)
     // Assurez-vous d'adapter cet appel à votre propre backend
@@ -72,13 +70,13 @@ export default RecipeScreen = ({ navigation }) => {
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
 
-  const handleIncrement = (item) => {
-    dispatch(incrementQuantity(item));
+  const handleIncrement = (itemId) => {
+    dispatch(incrementQuantity(itemId));
   };
-
-  const handleDecrement = (item) => {
-    dispatch(decrementQuantity(item));
-  };
+  
+  const handleDecrement = (itemId) => {
+    dispatch(decrementQuantity(itemId));
+  };  
 
   const handleRemove = (itemId) => {
     dispatch(removeFromCart(itemId));
@@ -98,7 +96,7 @@ export default RecipeScreen = ({ navigation }) => {
       />
       <View style={styles.productInfoContainer}>
         <Text style={[styles.productTitle]}>{item.title}</Text>
-        <Text style={[styles.productPrice]}>{item.price}€</Text>
+        <Text style={[styles.productPrice]}>{item.prix}€</Text>
       </View>
       <View style={styles.quantityContainer}>
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item)}>
@@ -111,9 +109,12 @@ export default RecipeScreen = ({ navigation }) => {
       </View>
       <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
         <FontAwesome name="trash-o" size={20} color="black" />
+        <Text>Supp</Text>
       </TouchableOpacity>
     </View>
   );
+
+  console.log(cartItems);
 
   return (
     <View style={[styles.main, isDarkMode && styles.mainDark]}>

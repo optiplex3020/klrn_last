@@ -214,7 +214,7 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
         },
         button_o: {
             marginHorizontal: 5,
-            marginTop: 90,
+            marginTop: 30,
             borderRadius: 242,
             alignItems: "center",
             height: 52,
