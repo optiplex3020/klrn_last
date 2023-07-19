@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Dimensions, RefreshControl, TouchableOpacity, FlatList, ScrollView, Image, TextInput, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, RefreshControl, TouchableOpacity, FlatList, ScrollView, Image,  Pressable } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import SearchComponent from '../components/SearchComponent';
 import { UserContext } from '../Context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
+import { AntDesign } from '@expo/vector-icons';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
@@ -13,14 +14,11 @@ require('firebase/compat/firestore');
 
 const HomeScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-  const [snapshot, setSnapshot] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [post, setPost] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [lastDoc, setLastDoc] = useState(null);
   const [loading, setLoading] = useState(null);
-  const [activeCategory, setActiveCategory] = useState(0);
-  const [user, setUser] = useContext(UserContext);
   const [username, setUsername] = useState('');
   const refPosts = firebase.firestore().collection('post');
   const auth = getAuth();
@@ -83,11 +81,19 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, isDarkMode && styles.containerDark]}>
       <View style={styles.subheader}>
-        <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
-        <SearchComponent />
-        <TouchableOpacity style={[styles.toggleButton]} onPress={toggleDarkMode}>
-          <Ionicons name={isDarkMode ? 'md-sunny' : 'md-moon'} size={24} color={isDarkMode ? '#000' : '#f7f7f7'} />
-        </TouchableOpacity>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity style={styles.toggleButton} onPress={toggleDarkMode}>
+            <Ionicons name={isDarkMode ? 'md-sunny' : 'md-moon'} size={24} color={isDarkMode ? '#FFF' : '#000'} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.headerCenter}>
+          <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.search} onPress={navigation.navigate('search')}>
+              <AntDesign name="search1" size={24} color={isDarkMode ? '#FFF' : '#000'} />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.main}>
         <Text style={[styles.recommand, isDarkMode && styles.recommandDark]}>Nos Recommandations</Text>
@@ -126,6 +132,7 @@ const HomeScreen = ({ navigation }) => {
       />
     </View>
   );
+  
 };
 
 const width = Dimensions.get('screen').width / 2;
@@ -137,29 +144,41 @@ const styles = StyleSheet.create({
   containerDark: {
     backgroundColor: '#000',
   },
-  subheader: {
-    marginTop: 35,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
   hi: {
-    fontSize: 28,
+    fontSize: 18,
     color: '#000',
     fontWeight: 'bold',
     marginBottom: 30,
   },
- 
-
  hiDark: {
     color: '#fff',
   },
+  subheader: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   toggleButton: {
-    backgroundColor: '#f7f7f7',
     borderRadius: 25,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    alignSelf: 'center',
+    paddingHorizontal: 10,
+    marginTop: -27,
+  },
+  search: {
+    marginTop: -27,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   toggleButtonDark: {
     backgroundColor: '#000',
@@ -186,7 +205,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   item: {
-    height: 190,
+    height: 220,
     width: width,
     fontSize: 12,
     fontWeight: 'bold',
@@ -195,8 +214,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     padding: 15,
-    shadowColor: '#000',
-    backgroundColor: '#fff',
   },
   itemDark: {
     backgroundColor: '#333',
