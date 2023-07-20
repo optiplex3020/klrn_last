@@ -90,7 +90,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.search} onPress={navigation.navigate('search')}>
+          <TouchableOpacity style={styles.search} onPress={navigation.navigate('SearchScreen')}>
               <AntDesign name="search1" size={24} color={isDarkMode ? '#FFF' : '#000'} />
           </TouchableOpacity>
         </View>

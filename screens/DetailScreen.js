@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import firebase from 'firebase/compat/app';
+import { useSelector } from 'react-redux';
 import { UserContext } from '../Context/UserContext';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
@@ -13,12 +13,26 @@ export default DetailScreen = ({ route, navigation }) => {
   const [value, setValue] = useState(0);
   const dispatch = useDispatch();
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const cartItems = useSelector((state) => state.cart);
 
-  const handleAddToCart = (item) => {
-    dispatch(addToCart({ ...item, quantity: 1 }));
+
+  const handleAddToCart = (item, quantity) => {
+    dispatch(addToCart({ ...item, quantity }));
   };
+  
+
+  
 
   const { item } = route.params;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const InteriorCard = ({ interior }) => {
     return <Image source={interior} style={styles.interiorImage} />;
@@ -28,7 +42,7 @@ export default DetailScreen = ({ route, navigation }) => {
     <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* item image */}
-        <View style={styles.backgroundImageContainer}>
+        <Animated.View style={[styles.backgroundImageContainer, { opacity: fadeAnim }]}>
           <ImageBackground style={styles.backgroundImage} source={{ uri: item.image }}>
             <View style={styles.header}>
               <View style={styles.headerBtn}>
@@ -44,38 +58,16 @@ export default DetailScreen = ({ route, navigation }) => {
           <View style={styles.virtualTag}>
             <Text style={{ color: '#fff' }}>Virtual tour</Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.detailsContainer}>
+        <Animated.View style={[styles.detailsContainer, { opacity: fadeAnim }]}>
           {/* Name and rating view container */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.title}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={styles.ratingTag}>
-                <Text style={{ color: '#fff' }}>4.8</Text>
-              </View>
-              <Text style={{ fontSize: 13, marginLeft: 5 }}>155 ratings</Text>
-            </View>
           </View>
 
           {/* Location text */}
           <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
-
-          {/* Facilities container */}
-          <View style={{ flexDirection: 'row', marginTop: 20 }}>
-            <NumericInput
-              value={value}
-              minValue={0}
-              totalHeight={30}
-              totalWidth={140}
-              step={1}
-              maxValue={10}
-              rounded
-              iconStyle={{ color: '#fff' }}
-              rightButtonBackgroundColor={'#000'}
-              leftButtonBackgroundColor={'#000'}
-            />
-          </View>
           <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
 
           {/* Interior list */}
@@ -87,18 +79,32 @@ export default DetailScreen = ({ route, navigation }) => {
             data={item.interiors}
             renderItem={({ item }) => <InteriorCard interior={item} />}
           />
+          <NumericInput
+            value={value}
+            onChange={setValue}
+            minValue={1}
+            valueType="integer"
+            totalWidth={100}
+            totalHeight={40}
+            rounded
+            textColor="#B0228C"
+            iconStyle={{ color: 'white' }}
+            rightButtonBackgroundColor="#EA3788"
+            leftButtonBackgroundColor="#E56B70"
+          />
 
           {/* footer container */}
           <View style={styles.footer}>
             <View>
               <Text style={{ color: '#001dff', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
-              <Text style={{ fontSize: 12, color: '#666666', fontWeight: 'bold' }}>Total Price</Text>
+              <Text style={{ fontSize: 12, color: '#666666', fontWeight: 'bold' }}>Prix total </Text>
             </View>
-            <TouchableOpacity onPress={() => handleAddToCart(item)} style={styles.bookNowBtn}>
+            <TouchableOpacity onPress={() => handleAddToCart(item, value)} style={styles.bookNowBtn}>
               <Text style={{ color: '#fff' }}>Ajouter au panier</Text>
             </TouchableOpacity>
+
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -167,6 +173,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: 70,
+    marginTop: "45%",
     backgroundColor: '#fff',
     borderRadius: 10,
     paddingHorizontal: 20,
