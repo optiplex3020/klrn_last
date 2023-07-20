@@ -59,6 +59,7 @@
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.5",
     "redux": "^4.2.0",
+    "rn-nodeify": "^10.3.0",
     "shared-element": "^1.0.1",
     "stripe": "^12.9.0",
     "styled-components": "^5.3.6"
