@@ -25,27 +25,26 @@ export default function SearchComponent() {
     
     return (
         <View style={styles.container}>
-            <View style={styles.search}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Recherche"
-                    value={searchQuery}
-                    onChangeText={query => setSearchQuery(query)}
-                    />
-                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                    <AntDesign name="search1" size={24} color="black" />
-                </TouchableOpacity>
-            </View>
-            <View>
-
-            <FlatList
-  data={searchResults}
-  renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
-  keyExtractor={item => item.id}
-/>
-
-            </View>
+          <View style={styles.search}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Votre prochain repas est ici"
+              placeholderTextColor="#8E8E8E"
+              value={searchQuery}
+              onChangeText={query => setSearchQuery(query)}
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                <AntDesign name="search1" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+        <View>
+          <FlatList
+            data={searchResults}
+            renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+            keyExtractor={item => item.id}
+          />
         </View>
+      </View>
     )
 }
 
@@ -53,7 +52,10 @@ export default function SearchComponent() {
 const styles=StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f7f7f7"
+        width: "95%",
+        flexDirection: 'row', 
+        alignItems: 'center',
+        justifyContent: 'center'
     },
       searchContainer: {
         backgroundColor: 'black',
@@ -73,13 +75,14 @@ const styles=StyleSheet.create({
         borderRadius: 25,
         width: "80%",
         height: 200,
-        marginLeft: 20
+        marginLeft: 20,
+        color: "#66666"
       },
       search: {
         height: 45,
         width: "95%",
-        backgroundColor: "#fff",
-        borderRadius: 7,
+        backgroundColor: "#494949",
+        borderRadius: 10,
         flexDirection: 'row', 
         alignItems: 'center',
         shadowOpacity: 0.2,

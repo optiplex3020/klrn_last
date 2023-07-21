@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, Text, View, Dimensions, RefreshControl, TouchableOpacity, FlatList, ScrollView, Image,  Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import SearchComponent from '../components/SearchComponent'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { ThemeContext } from '../Context/ThemeContext';
@@ -83,19 +84,51 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 
+  const renderItem2 = ({ item }) => (
+    <View style={[styles.card, isDarkMode && styles.cardDark]}>
+    <Image source={{ uri: item.image }} style={styles.cardImage} />
+    <View style={styles.cardInfo}>
+      <View style={styles.titleContainer}>
+        <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
+      </View>
+      <Text style={[styles.price, isDarkMode && styles.priceDark]}>{item.prix}€</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.buttonText}>Ajouter au panier</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.favoriteButton}>
+          {/* Mettez ici l'icône pour le bouton favori */}
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+  );
+
   return (
     <View style={[styles.container, isDarkMode && styles.containerDark]}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.toggleButton} onPress={toggleDarkMode}>
-          <Ionicons name={isDarkMode ? 'md-sunny' : 'md-moon'} size={24} color={isDarkMode ? '#FFF' : '#000'} />
-        </TouchableOpacity>
         <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
-        <TouchableOpacity style={styles.search} onPress={navigation.navigate('Search')}>
-          <AntDesign name="search1" size={24} color={isDarkMode ? '#FFF' : '#000'} />
-        </TouchableOpacity>
+        <View style={styles.search}>
+          <SearchComponent/>
+        </View>
       </View>
       <View style={styles.recommendationContainer}>
-        <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>Nos Recommandations</Text>
+        <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
+          Les plus populaires
+        </Text>
+        <FlatList
+        data={post}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 50,
+        }}
+        keyExtractor={(item) => item.id}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#F8852D" />}
+        extraData={selectedId}
+        renderItem={renderItem2}
+      />
       </View>
       <FlatList
         columnWrapperStyle={{ justifyContent: 'space-between' }}
@@ -124,20 +157,84 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    marginTop: 30,
+    height: "22%",
     paddingHorizontal: 20,
     paddingVertical: 20,
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: "#202020",
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35
   },
   hi: {
     fontSize: 18,
-    color: '#000',
+    color: '#FFF',
     fontWeight: 'bold',
+    marginTop: 25
   },
   hiDark: {
     color: '#fff',
+  },
+  card: {
+    width: 200,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  cardDark: {
+    borderColor: '#666',
+  },
+  cardImage: {
+    width: '100%',
+    height: 150,
+  },
+  cardInfo: {
+    padding: 10,
+  },
+  titleContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 5,
+    borderRadius: 5,
+  },
+  title: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  addButton: {
+    flex: 1,
+    backgroundColor: '#F8852D',
+    paddingVertical: 8,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  favoriteButton: {
+    flex: 1,
+    backgroundColor: '#333',
+    paddingVertical: 8,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   toggleButton: {
     borderRadius: 25,
@@ -146,10 +243,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   search: {
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    marginTop: -10
   },
   recommendationContainer: {
     marginTop: 10,
@@ -164,6 +258,16 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   item: {
+    height: 260,
+    width: '48%',
+    borderRadius: 10,
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    elevation: 5,
+    justifyContent: 'space-between',
+  },
+  item2: {
     height: 260,
     width: '48%',
     borderRadius: 10,
