@@ -34,9 +34,6 @@ export default DetailScreen = ({ route, navigation }) => {
     }).start();
   }, []);
 
-  const InteriorCard = ({ interior }) => {
-    return <Image source={interior} style={styles.interiorImage} />;
-  };
 
   return (
     <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
@@ -70,15 +67,6 @@ export default DetailScreen = ({ route, navigation }) => {
           <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
           <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
 
-          {/* Interior list */}
-          <FlatList
-            contentContainerStyle={{ marginTop: 20 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(_, key) => key.toString()}
-            data={item.interiors}
-            renderItem={({ item }) => <InteriorCard interior={item} />}
-          />
           <NumericInput
             value={value}
             onChange={setValue}
@@ -87,10 +75,10 @@ export default DetailScreen = ({ route, navigation }) => {
             totalWidth={100}
             totalHeight={40}
             rounded
-            textColor="#B0228C"
+            textColor="#000"
             iconStyle={{ color: 'white' }}
-            rightButtonBackgroundColor="#EA3788"
-            leftButtonBackgroundColor="#E56B70"
+            rightButtonBackgroundColor="#000"
+            leftButtonBackgroundColor="#000"
           />
 
           {/* footer container */}

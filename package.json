@@ -29,6 +29,7 @@
     "expo-modules-core": "~1.2.7",
     "expo-permissions": "~14.1.1",
     "expo-status-bar": "~1.4.4",
+    "expo-updates": "~0.16.4",
     "firebase": "^9.6.11",
     "firebase-admin": "^11.10.1",
     "lodash.filter": "^4.6.0",
