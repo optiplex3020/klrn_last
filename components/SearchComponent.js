@@ -5,48 +5,41 @@ require('firebase/compat/firestore')
 import firebase from "firebase/compat/app";
 import { AntDesign } from '@expo/vector-icons';
 
+export default function SearchComponent({ onSearchResults }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
+  const handleSearch = () => {
+    firebase
+      .firestore()
+      .collection('post')
+      .where('title', '>=', searchQuery)
+      .get()
+      .then((querySnapshot) => {
+        const results = querySnapshot.docs.map((doc) => doc.data());
+        setSearchResults(results);
+        onSearchResults(results); // Pass the search results to the HomeScreen
+      });
+  };
 
-export default function SearchComponent() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-
-    const handleSearch = () => {
-        firebase
-          .firestore()
-          .collection('post')
-          .where('title', '>=', searchQuery)
-          .get()
-          .then(querySnapshot => {
-            const results = querySnapshot.docs.map(doc => doc.data());
-            setSearchResults(results);
-          });
-      };
-    
-    return (
-        <View style={styles.container}>
-          <View style={styles.search}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Votre prochain repas est ici"
-              placeholderTextColor="#8E8E8E"
-              value={searchQuery}
-              onChangeText={query => setSearchQuery(query)}
-            />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                <AntDesign name="search1" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        <View>
-          <FlatList
-            data={searchResults}
-            renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
-            keyExtractor={item => item.id}
-          />
-        </View>
+  return (
+    <View style={styles.container}>
+      <View style={styles.search}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Votre prochain repas est ici"
+          placeholderTextColor="#8E8E8E"
+          value={searchQuery}
+          onChangeText={(query) => setSearchQuery(query)}
+        />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <AntDesign name="search1" size={24} color="white" />
+        </TouchableOpacity>
       </View>
-    )
+    </View>
+  );
 }
+
 
 
 const styles=StyleSheet.create({

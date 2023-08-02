@@ -81,27 +81,6 @@ const BottomTabNavigator = () => {
             />
 
             <Tab.Screen
-                name="Post"
-                component={PostScreen}
-                options={{
-                    headerShown: false,
-                    tabBarLabel:"",
-                    tabBarIcon: ({ focused }) => (
-                        <View style={{
-                            position: 'absolute',
-                            top: '50%'
-                        }}>
-                            <FontAwesome5
-                                name="plus"
-                                size={20}
-                                color={focused ? '#009387' : 'grey'} />
-                        </View>
-                    
-                    )
-                }}
-            />
-
-            <Tab.Screen
                 name="Recipe"
                 component={RecipeScreen}
                 options={{
@@ -113,27 +92,7 @@ const BottomTabNavigator = () => {
                             top: '50%'
                         }}>
                             <FontAwesome5
-                                name="heart"
-                                size={20}
-                                color={focused ? '#009387' : 'grey'} />
-                        </View>
-                    
-                    )
-                }}
-            />
-            <Tab.Screen
-                name="Profile"
-                component={ProfileScreen}
-                options={{
-                    headerShown: false,
-                    tabBarLabel:"",
-                    tabBarIcon: ({ focused }) => (
-                        <View style={{
-                            position: 'absolute',
-                            top: '50%'
-                        }}>
-                            <FontAwesome5
-                                name="user"
+                                name="shopping-cart"
                                 size={20}
                                 color={focused ? '#009387' : 'grey'} />
                         </View>

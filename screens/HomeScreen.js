@@ -23,6 +23,8 @@ const HomeScreen = ({ navigation }) => {
   const refPosts = firebase.firestore().collection('post');
   const auth = getAuth();
 
+  const [showSearchResults, setShowSearchResults] = useState(false); // Add this line
+  const [searchResults, setSearchResults] = useState([]);
   const dispatch = useDispatch();
 
   const handleAddToCart = (item) => {
@@ -71,6 +73,11 @@ const HomeScreen = ({ navigation }) => {
     setIsRefreshing(false);
   };
 
+
+  const handleToggleSearchResults = () => {
+    setShowSearchResults(!showSearchResults);
+  };
+
   const renderItem = ({ item }) => (
     <View>
       <Pressable
@@ -85,85 +92,95 @@ const HomeScreen = ({ navigation }) => {
         <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.categorie}</Text>
         <Text style={[styles.text, styles.price, isDarkMode && styles.textDark]}>{item.prix}€</Text>
       </Pressable>
-    </View>
-  );
+    </View>  );
 
   const renderItem2 = ({ item }) => (
     <View style={[styles.card]}>
-      <Pressable onPress={() => {
-        navigation.navigate('Detail', {
-        item: item,
-        });
-      }}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardInfo}>
-        <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
-        <Text style={[styles.category, isDarkMode && styles.categoryDark]}>{item.categorie}</Text>
-        <Text style={[styles.price, isDarkMode && styles.priceDark]}>{item.prix}€</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item)}>
-            <Text style={styles.buttonText}>Ajouter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.favoriteButton}>
-            <Ionicons name="heart-outline" size={14} color="#fff" />
-          </TouchableOpacity>
-        </View>
+    <Pressable onPress={() => {
+      navigation.navigate('Detail', {
+      item: item,
+      });
+    }}>
+    <Image source={{ uri: item.image }} style={styles.cardImage} />
+    <View style={styles.cardInfo}>
+      <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
+      <Text style={[styles.category, isDarkMode && styles.categoryDark]}>{item.categorie}</Text>
+      <Text style={[styles.price, isDarkMode && styles.priceDark]}>{item.prix}€</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item)}>
+          <Text style={styles.buttonText}>Ajouter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.favoriteButton}>
+          <Ionicons name="heart-outline" size={14} color="#fff" />
+        </TouchableOpacity>
       </View>
-    </Pressable>
-  </View>
-
-  );
+    </View>
+  </Pressable>
+</View>  );
 
   return (
-    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
       <View style={[styles.container, isDarkMode && styles.containerDark]}>
-      <View style={styles.header}>
-        <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
-        <View style={styles.search}>
-          <SearchComponent/>
+        <View style={styles.header}>
+          <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
+          <View style={styles.search}>
+            <SearchComponent
+              showResults={showSearchResults}
+              onToggleResults={handleToggleSearchResults}
+            />
+          </View>
         </View>
-      </View>
-      <View style={styles.recommendationContainer}>
-        <CategoryComponent/>
+        {showSearchResults && (
+          <View style={styles.searchResultsContainer}>
+            <FlatList
+              data={searchResults}
+              renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+              keyExtractor={item => item.id}
+            />
+          </View>
+        )}
+        <View style={styles.recommendationContainer}>
+          <CategoryComponent/>
+          <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
+            Les plus populaires
+          </Text>
+          <FlatList
+            data={post}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingBottom: 50,
+            }}
+            keyExtractor={(item) => item.id}
+            extraData={selectedId}
+            renderItem={renderItem2}
+          />
+        </View>
         <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
-          Les plus populaires
-        </Text>
-        <FlatList
-        data={post}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingBottom: 50,
-        }}
-        keyExtractor={(item) => item.id}
-        extraData={selectedId}
-        renderItem={renderItem2}
-      />
-      </View>
-      <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
           Les dernières tendances
         </Text>
-      <FlatList
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        data={post}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingBottom: 50,
-        }}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#F8852D" />}
-        extraData={selectedId}
-        renderItem={renderItem}
-      />
-    </View>
+        <FlatList
+          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          data={post}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingBottom: 50,
+          }}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#F8852D" />}
+          extraData={selectedId}
+          renderItem={renderItem}
+        />
+      </View>
     </ScrollView>
   );
 };
 
 const width = Dimensions.get('screen').width / 2;
+
 
 const styles = StyleSheet.create({
   container: {
