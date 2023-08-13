@@ -1,23 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { useStripe } from '@stripe/stripe-react-native';
+import { useStripe, usePaymentSheet, CardField } from '@stripe/stripe-react-native'; // Assurez-vous d'utiliser les bons hooks
 
 export default RecipeScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
 
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
+  
+  const [loading, setLoading] = useState(true);
   const [paymentSheetOpen, setPaymentSheetOpen] = useState(false); // État de l'affichage du processus de paiement
 
   const fetchPaymentSheetParams = async () => {
     // Effectuez votre appel API pour récupérer les paramètres du paiement (paymentIntent, ephemeralKey, customer, etc.)
     // Assurez-vous d'adapter cet appel à votre propre backend
-    const response = await fetch(`${API_URL}/payment-sheet`, {
-      method: 'POST',
+    const response = await fetch(`pk_live_51NHsDFIldimfBY6sVhbIjpv4YRu5srhfFolF3tDpO2MorXH7qk7RpLx0MMsMmQURyRLOKJkIXwrcfLTRymUcWq8G00GFwgRXEW/payment-sheet`, {
+      method: 'POST', 
       headers: {
         'Content-Type': 'application/json',
       },
@@ -29,7 +30,7 @@ export default RecipeScreen = ({ navigation }) => {
       ephemeralKey,
       customer,
     };
-  };
+  }; 
 
   const initializePaymentSheet = async () => {
     const {
@@ -38,28 +39,35 @@ export default RecipeScreen = ({ navigation }) => {
       customer,
       publishableKey,
     } = await fetchPaymentSheetParams();
-
+  
+    console.log('paymentIntent:', paymentIntent);
+    console.log('ephemeralKey:', ephemeralKey);
+    console.log('customer:', customer);
+  
     const { error } = await initPaymentSheet({
+      paymentSheetEnabled: true,
       merchantDisplayName: 'Example, Inc.',
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
-      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
-      // methods that complete payment after a delay, like SEPA Debit and Sofort.
-      allowsDelayedPaymentMethods: true,
-      defaultBillingDetails: {
-        name: 'Jane Doe',
-      },
+      // ...
     });
-    if (!error) {
-      setLoading(true);
+  
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
     }
   };
+  
+
+
 
   const openPaymentSheet = async () => {
     const { error } = await presentPaymentSheet();
+
     if (error) {
-      // Gérer les erreurs de paiement
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert('Success', 'Your order is confirmed!');
     }
   };
 
@@ -128,11 +136,30 @@ export default RecipeScreen = ({ navigation }) => {
         contentContainerStyle={styles.flatListContainer}
       />
       <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
-      {loading && (
         <TouchableOpacity style={[styles.paymentButton]} onPress={openPaymentSheet}>
           <Text style={[styles.paymentButtonText]}>Payer</Text>
         </TouchableOpacity>
-      )}
+      <CardField
+      postalCodeEnabled={true}
+      placeholders={{
+        number: '4242 4242 4242 4242',
+      }}
+      cardStyle={{
+        backgroundColor: '#FFFFFF',
+        textColor: '#000000',
+      }}
+      style={{
+        width: '100%',
+        height: 50,
+        marginVertical: 30,
+      }}
+      onCardChange={(cardDetails) => {
+        console.log('cardDetails', cardDetails);
+      }}
+      onFocus={(focusedField) => {
+        console.log('focusField', focusedField);
+      }}
+    />
     </View>
   );
 };

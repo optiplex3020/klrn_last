@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "airlibre-9c426"
-  }
+    "default": "airlibre-9c426",
+    "kolia": "airlibre-9c426"
+  },
+  "targets": {},
+  "etags": {}
 }
