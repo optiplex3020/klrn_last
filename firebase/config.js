@@ -4,7 +4,7 @@ import { getStorage } from 'firebase/storage'
 
 const FirebaseKeys = {
     
-      apiKey: "AIzaSyCFS3YqoFRZLYnBJzLN9dL8ugXn1_yBYSA",
+    apiKey: "AIzaSyCFS3YqoFRZLYnBJzLN9dL8ugXn1_yBYSA",
     authDomain: "airlibre-9c426.firebaseapp.com",
     databaseURL: "https://airlibre-9c426.firebaseio.com",
     projectId: "airlibre-9c426",
@@ -19,6 +19,8 @@ const FirebaseKeys = {
 const app = getApps.length > 0 ? getApp() : initializeApp(FirebaseKeys)
 
 const storage = getStorage(app)
+export const stripeSecretKey = 'sk_test_51NHsDFIldimfBY6saiXKv9gbaLkmkuniuOwppbXMVbq5spzObeb4GrHq4A1dYNQbdXtI2sojnOfdMdtxF9Q4AQbU00dxHC5Fq8';
+
 
 export const auth = getAuth();
 export {storage }

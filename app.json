@@ -42,6 +42,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "stripe_api_key": "pk_live_51NHsDFIldimfBY6sVhbIjpv4YRu5srhfFolF3tDpO2MorXH7qk7RpLx0MMsMmQURyRLOKJkIXwrcfLTRymUcWq8G00GFwgRXEW"
     }
   }
 }

@@ -1,82 +1,50 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Button } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { useStripe, usePaymentSheet, CardField } from '@stripe/stripe-react-native'; // Assurez-vous d'utiliser les bons hooks
+import { CardField, useStripe } from '@stripe/stripe-react-native';
+
+
+
 
 export default RecipeScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const stripe = useStripe();
+  const cartItems = useSelector(state => state.cart); 
+  const dispatch = useDispatch();
 
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  
-  const [loading, setLoading] = useState(true);
-  const [paymentSheetOpen, setPaymentSheetOpen] = useState(false); // État de l'affichage du processus de paiement
-
-  const fetchPaymentSheetParams = async () => {
-    // Effectuez votre appel API pour récupérer les paramètres du paiement (paymentIntent, ephemeralKey, customer, etc.)
-    // Assurez-vous d'adapter cet appel à votre propre backend
-    const response = await fetch(`pk_live_51NHsDFIldimfBY6sVhbIjpv4YRu5srhfFolF3tDpO2MorXH7qk7RpLx0MMsMmQURyRLOKJkIXwrcfLTRymUcWq8G00GFwgRXEW/payment-sheet`, {
-      method: 'POST', 
+  const handlePayment = async () => {
+    // Create a payment intent on your backend and get a client secret
+    const response = await fetch('http://localhost:3000/create-payment-intent', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        items: cartItems,
+        currency: 'eur', // Adjust as needed
+      }),
     });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    const { clientSecret } = await response.json();
 
-    return {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    };
-  }; 
-
-  const initializePaymentSheet = async () => {
-    const {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-      publishableKey,
-    } = await fetchPaymentSheetParams();
-  
-    console.log('paymentIntent:', paymentIntent);
-    console.log('ephemeralKey:', ephemeralKey);
-    console.log('customer:', customer);
-  
-    const { error } = await initPaymentSheet({
-      paymentSheetEnabled: true,
-      merchantDisplayName: 'Example, Inc.',
-      customerId: customer,
-      customerEphemeralKeySecret: ephemeralKey,
-      paymentIntentClientSecret: paymentIntent,
-      // ...
+    // Confirm the payment with Stripe
+    const { error, paymentIntent } = await stripe.confirmPayment(clientSecret, {
+      type: 'Card',
+      billingDetails: {
+        name: 'John Doe',
+        email: 'john@example.com',
+      },
     });
-  
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    }
-  };
-  
-
-
-
-  const openPaymentSheet = async () => {
-    const { error } = await presentPaymentSheet();
 
     if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
+      console.error('Error processing payment:', error);
     } else {
-      Alert.alert('Success', 'Your order is confirmed!');
+      console.log('Payment successful:', paymentIntent);
+      // Handle success, navigate to success screen, etc.
     }
   };
-
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
-
-  const cartItems = useSelector(state => state.cart);
-  const dispatch = useDispatch();
 
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
@@ -107,21 +75,22 @@ export default RecipeScreen = ({ navigation }) => {
         <Text style={[styles.productPrice]}>{item.prix}€</Text>
       </View>
       <View style={styles.quantityContainer}>
-        <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item)}>
+      <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
+        <FontAwesome name="trash-o" size={20} color="black" />
+      </TouchableOpacity>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.id)}>
           <Text style={[styles.quantityButtonText]}>-</Text>
         </TouchableOpacity>
         <Text style={[styles.quantityText]}>{item.quantity}</Text>
-        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item)}>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.id)}>
           <Text style={[styles.quantityButtonText]}>+</Text>
         </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
-        <FontAwesome name="trash-o" size={20} color="black" />
-        <Text>Supp</Text>
+      <TouchableOpacity onPress={handlePayment}>
+        <Text style={styles.paymentButton}>Payer</Text>
       </TouchableOpacity>
+      </View>
     </View>
   );
-
   console.log(cartItems);
 
   return (
@@ -135,31 +104,6 @@ export default RecipeScreen = ({ navigation }) => {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.flatListContainer}
       />
-      <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
-        <TouchableOpacity style={[styles.paymentButton]} onPress={openPaymentSheet}>
-          <Text style={[styles.paymentButtonText]}>Payer</Text>
-        </TouchableOpacity>
-      <CardField
-      postalCodeEnabled={true}
-      placeholders={{
-        number: '4242 4242 4242 4242',
-      }}
-      cardStyle={{
-        backgroundColor: '#FFFFFF',
-        textColor: '#000000',
-      }}
-      style={{
-        width: '100%',
-        height: 50,
-        marginVertical: 30,
-      }}
-      onCardChange={(cardDetails) => {
-        console.log('cardDetails', cardDetails);
-      }}
-      onFocus={(focusedField) => {
-        console.log('focusField', focusedField);
-      }}
-    />
     </View>
   );
 };
