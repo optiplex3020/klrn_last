@@ -24,7 +24,7 @@ const BottomTabNavigator = () => {
                     right: 20,
                     elevation: 0,
                     backgroundColor: '#f7f7f7',
-                    borderRadius: 15,
+                    borderRadius: 55,
                     height: 90
                 }
             }}
@@ -129,7 +129,7 @@ const screenOptionStyle = {
 const MainStackScreens = () => {
     return(
         <Stack.Navigator screenOptions={screenOptionStyle}>
-            <Stack.Screen name="Home" component={BottomTabNavigator}/>
+            <Stack.Screen name="Acceuil" component={BottomTabNavigator}/>
             <Stack.Screen name="Detail" component={DetailScreen} sharedElements={(route) => {
                 return [route.params.post.uid];
                 }}/> 

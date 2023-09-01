@@ -44,7 +44,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "stripe_api_key": "pk_live_51NHsDFIldimfBY6sVhbIjpv4YRu5srhfFolF3tDpO2MorXH7qk7RpLx0MMsMmQURyRLOKJkIXwrcfLTRymUcWq8G00GFwgRXEW"
+      "stripe_api_key": "pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy"
     }
   }
 }

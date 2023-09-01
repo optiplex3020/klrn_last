@@ -1,23 +1,55 @@
-const express = require('express');
-const stripe = require('stripe')('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');
-const app = express();
+// Import the Stripe API
+const stripe = require("stripe");
+import { useSelector, useDispatch } from 'react-redux';
 
-app.use(express.json());
+// Create a connection to the Stripe API
+stripe.setAppId("YOUR_STRIPE_APP_ID");
+stripe.setApiKey("pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy");
 
-app.post('/create-payment-intent', async (req, res) => {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.amount,
-      currency: 'eur',
-    });
-
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    console.error('Error creating payment intent:', error);
-    res.status(500).json({ error: 'Could not create payment intent' });
+// Function to handle an HTTP request
+exports.handler = async (req, res) => {
+  // Check if the request is a POST request
+  if (req.method !== "POST") {
+    res.status(405).send("Only POST requests are supported");
+    return;
   }
-});
 
-app.listen(3000, () => {
-  console.log('Serveur Express en cours d\'écoute sur le port 3000');
-});
+  // Parse the request body
+  const body = await req.body.json();
+
+  // Check if the request body contains the necessary information
+  if (!body.amount || !body.currency || !body.cardNumber || !body.expirationDate || !body.cvc) {
+    res.status(400).send("Invalid request body");
+    return;
+  }
+
+  // Get the cart information from Redux
+  const cart = await store.getState().cart;
+  const cartItems = useSelector(state => state.cart);
+  let totalPrice = cartItems.reduce((total, item) => {
+    const itemTotalPrice = item.prix * item.quantity;
+    return total + itemTotalPrice;
+  }, 0);
+
+  // Make a payment with Stripe
+  const payment = await stripe.charges.create({
+    amount: body.amount,
+    currency: body.currency,
+    card: {
+      number: body.cardNumber,
+      expirationMonth: body.expirationDate.split("/")[0],
+      expirationYear: body.expirationDate.split("/")[1],
+      cvc: body.cvc,
+    },
+    items: cart.items.map((item) => {
+      return {
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name,
+      };
+    }),
+  });
+
+  // Send the response
+  res.status(200).send(payment);
+};

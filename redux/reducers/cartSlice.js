@@ -33,9 +33,7 @@ const cartSlice = createSlice({
       const itemId = action.payload;
       return state.filter((item) => item.id !== itemId);
     },
-    clearCart: () => {
-      return [];
-    },
+    clearCart: () => [],
   },
 });
 

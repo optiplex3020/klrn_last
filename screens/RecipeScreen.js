@@ -1,50 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
-
-
-
+import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
 
 export default RecipeScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-  const stripe = useStripe();
-  const cartItems = useSelector(state => state.cart); 
+
+
+  const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
-
-  const handlePayment = async () => {
-    // Create a payment intent on your backend and get a client secret
-    const response = await fetch('http://localhost:3000/create-payment-intent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        items: cartItems,
-        currency: 'eur', // Adjust as needed
-      }),
-    });
-    const { clientSecret } = await response.json();
-
-    // Confirm the payment with Stripe
-    const { error, paymentIntent } = await stripe.confirmPayment(clientSecret, {
-      type: 'Card',
-      billingDetails: {
-        name: 'John Doe',
-        email: 'john@example.com',
-      },
-    });
-
-    if (error) {
-      console.error('Error processing payment:', error);
-    } else {
-      console.log('Payment successful:', paymentIntent);
-      // Handle success, navigate to success screen, etc.
-    }
-  };
 
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
@@ -55,8 +22,50 @@ export default RecipeScreen = ({ navigation }) => {
   };  
 
   const handleRemove = (itemId) => {
-    dispatch(removeFromCart(itemId));
+    Alert.alert(
+      'Confirmation',
+      'Êtes-vous sûr de vouloir supprimer cet article du panier ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel'
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: () => {
+            dispatch(removeFromCart(itemId));
+          }
+        }
+      ]
+    );
   };
+
+  const handlePayment = async (amount) => {
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  
+    try {
+      // Initialisation du PaymentSheet avec les détails du paiement
+      await initPaymentSheet({
+        paymentIntentClientSecret: 'TON_CLIENT_SECRET', // Obtenu côté serveur depuis Stripe
+        customFlow: true,
+        merchantDisplayName: 'KoLia Fr',
+      });
+  
+      // Présentation du PaymentSheet au client
+      const { error } = await presentPaymentSheet();
+      if (error) {
+        console.error('Erreur de paiement :', error);
+      } else {
+        console.log('Paiement réussi !');
+        // Ici, tu peux vider le panier ou faire d'autres actions après le paiement réussi
+      }
+    } catch (e) {
+      console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
+    }
+  };
+  
+  
 
   let totalPrice = cartItems.reduce((total, item) => {
     const itemTotalPrice = item.prix * item.quantity;
@@ -75,9 +84,6 @@ export default RecipeScreen = ({ navigation }) => {
         <Text style={[styles.productPrice]}>{item.prix}€</Text>
       </View>
       <View style={styles.quantityContainer}>
-      <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
-        <FontAwesome name="trash-o" size={20} color="black" />
-      </TouchableOpacity>
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.id)}>
           <Text style={[styles.quantityButtonText]}>-</Text>
         </TouchableOpacity>
@@ -85,26 +91,47 @@ export default RecipeScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.id)}>
           <Text style={[styles.quantityButtonText]}>+</Text>
         </TouchableOpacity>
-      <TouchableOpacity onPress={handlePayment}>
-        <Text style={styles.paymentButton}>Payer</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
+          <FontAwesome name="trash-o" size={20} color="black" />
+        </TouchableOpacity>
       </View>
+
     </View>
   );
+  
+
   console.log(cartItems);
 
   return (
-    <View style={[styles.main, isDarkMode && styles.mainDark]}>
-      <View style={styles.header}>
-        <Text style={[styles.title]}>Panier</Text>
+    <StripeProvider publishableKey='pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy'>
+      <View style={[styles.main, isDarkMode && styles.mainDark]}>
+        <View style={styles.header}>
+          <Text style={[styles.title]}>Panier</Text>
+        </View>
+        {cartItems.length === 0 ? (
+          <Text style={styles.emptyCartMessage}>Votre panier est vide.</Text>
+        ) : (
+          <FlatList
+            data={cartItems}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.flatListContainer}
+          />
+        )}
+
+        <View style={styles.view2}>
+
+        </View>
+        <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
+        <TouchableOpacity
+          style={[styles.paymentButton]}
+          onPress={() => handlePayment(totalPrice)}
+        >
+          <Text style={[styles.paymentButtonText]}>Payer</Text>
+        </TouchableOpacity>
+
       </View>
-      <FlatList
-        data={cartItems}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.flatListContainer}
-      />
-    </View>
+    </StripeProvider>
   );
 };
 
@@ -123,6 +150,9 @@ const styles = StyleSheet.create({
     height: '12%',
     alignItems: 'center'
   },
+  view2: {
+    marginTop: -1200
+  },
   title: {
     marginTop: 50,
     fontWeight: 'bold',
@@ -135,9 +165,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    width: '100',
+    width: '100%', // Modifier cette ligne
     marginLeft: '4%'
   },
+  
   productImage: {
     width: 70,
     height: 70,
@@ -176,7 +207,8 @@ const styles = StyleSheet.create({
   paymentButton: {
     marginTop: 20,
     padding: 10,
-    borderRadius: 5
+    borderRadius: 5,
+    backgroundColor: "#B0228C"
   },
   paymentButtonText: {
     fontWeight: 'bold',

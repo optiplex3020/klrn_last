@@ -69,7 +69,7 @@ const styles=StyleSheet.create({
         width: "80%",
         height: 200,
         marginLeft: 20,
-        color: "#66666"
+        color: "#666666"
       },
       search: {
         height: 45,

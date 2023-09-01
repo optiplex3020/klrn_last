@@ -1,52 +1,23 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Dimensions, RefreshControl, TouchableOpacity, FlatList, ScrollView, Image,  Pressable } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../redux/reducers/cartSlice';
-import SearchComponent from '../components/SearchComponent'
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { ThemeContext } from '../Context/ThemeContext';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-import CategoryComponent from '../components/CategoryComponent';
 require('firebase/compat/firestore');
 
 const HomeScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [post, setPost] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [lastDoc, setLastDoc] = useState(null);
   const [loading, setLoading] = useState(null);
-  const [username, setUsername] = useState('');
   const refPosts = firebase.firestore().collection('post');
-  const auth = getAuth();
-
-  const [showSearchResults, setShowSearchResults] = useState(false); // Add this line
-  const [searchResults, setSearchResults] = useState([]);
-  const dispatch = useDispatch();
-
-  const handleAddToCart = (item) => {
-    dispatch(addToCart({ ...item, quantity: 1 }));
+  const [isMenuVisible, setMenuVisible] = useState(false);
+  const toggleMenu = () => {
+    setMenuVisible(!isMenuVisible);
   };
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
-        const userRef = firebase.firestore().collection('users').doc(uid);
-        userRef.get().then((doc) => {
-          if (doc.exists) {
-            setUsername(doc.data().username);
-          } else {
-            console.log('No such document!');
-          }
-        });
-      }
-    });
-  }, []);
-
   const getPosts = async () => {
     setLoading(true);
     const snapshot = await refPosts.orderBy('title', 'desc').limit(20).get();
@@ -67,17 +38,6 @@ const HomeScreen = ({ navigation }) => {
     getPosts();
   }, []);
 
-  const onRefresh = () => {
-    setIsRefreshing(true);
-    getPosts();
-    setIsRefreshing(false);
-  };
-
-
-  const handleToggleSearchResults = () => {
-    setShowSearchResults(!showSearchResults);
-  };
-
   const renderItem = ({ item }) => (
     <View>
       <Pressable
@@ -92,57 +52,74 @@ const HomeScreen = ({ navigation }) => {
         <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.categorie}</Text>
         <Text style={[styles.text, styles.price, isDarkMode && styles.textDark]}>{item.prix}€</Text>
       </Pressable>
-    </View>  );
+    </View>  
+  );
 
   const renderItem2 = ({ item }) => (
     <View style={[styles.card]}>
-    <Pressable onPress={() => {
-      navigation.navigate('Detail', {
-      item: item,
-      });
-    }}>
-    <Image source={{ uri: item.image }} style={styles.cardImage} />
-    <View style={styles.cardInfo}>
-      <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
-      <Text style={[styles.category, isDarkMode && styles.categoryDark]}>{item.categorie}</Text>
-      <Text style={[styles.price, isDarkMode && styles.priceDark]}>{item.prix}€</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item)}>
-          <Text style={styles.buttonText}>Ajouter</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.favoriteButton}>
-          <Ionicons name="heart-outline" size={14} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  </Pressable>
-</View>  );
+      <Pressable onPress={() => { navigation.navigate('Detail', {
+        item: item,
+        });
+      }}>
+        <Image source={{ uri: item.image }} style={styles.cardImage} />
+        <View style={styles.cardInfo}>
+          <Text style={[styles.titleDark, isDarkMode && styles.titleDark]}>{item.title}</Text>
+          <Text style={[styles.category, isDarkMode && styles.categoryDark]}>{item.categorie}</Text>
+          <Text style={[styles.price, isDarkMode && styles.priceDark]}>{item.prix}€</Text>
+          <View style={styles.buttonContainer}>
+          </View>
+        </View>
+      </Pressable>
+    </View>  
+  );
 
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
       <View style={[styles.container, isDarkMode && styles.containerDark]}>
-        <View style={styles.header}>
-          <Text style={[styles.hi, isDarkMode && styles.hiDark]}>Bonjour, {username}</Text>
-          <View style={styles.search}>
-            <SearchComponent
-              showResults={showSearchResults}
-              onToggleResults={handleToggleSearchResults}
-            />
-          </View>
+        <View style={[styles.header, isDarkMode && styles.headerDark]}>
+        <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]} onPress={toggleMenu}>
+          <Ionicons name="menu-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
+        </TouchableOpacity>
+        <Text style={[styles.appName, isDarkMode && styles.appNameDark]}>Kolia</Text>
+        <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]}>
+          <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
+        </TouchableOpacity>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isMenuVisible}
+            onRequestClose={toggleMenu}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.menu, isDarkMode && styles.menuDark]}>
+                <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+                  <Ionicons name="close-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]} onPress={toggleDarkMode}>
+                  <Ionicons
+                    name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+                    size={24}
+                    color={isDarkMode ? 'white' : 'black'} // Changez la couleur en fonction du mode sombre
+                  />
+                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>
+                    Mode {isDarkMode ? 'clair' : 'sombre'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
+                  <Ionicons name="home-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
+                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Accueil</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
+                  <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
+                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Paramètres</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
-        {showSearchResults && (
-          <View style={styles.searchResultsContainer}>
-            <FlatList
-              data={searchResults}
-              renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
-              keyExtractor={item => item.id}
-            />
-          </View>
-        )}
         <View style={styles.recommendationContainer}>
-          <CategoryComponent/>
           <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
-            Les plus populaires
+            Voyagez dès maintenant
           </Text>
           <FlatList
             data={post}
@@ -158,7 +135,7 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
         <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
-          Les dernières tendances
+          En Tendances
         </Text>
         <FlatList
           columnWrapperStyle={{ justifyContent: 'space-between' }}
@@ -170,7 +147,6 @@ const HomeScreen = ({ navigation }) => {
           }}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#F8852D" />}
           extraData={selectedId}
           renderItem={renderItem}
         />
@@ -180,6 +156,7 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const width = Dimensions.get('screen').width / 2;
+const {  height } = Dimensions.get('window');
 
 
 const styles = StyleSheet.create({
@@ -191,39 +168,89 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    height: "10%",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    flexDirection: 'row',
+    marginTop: "8%",
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: "#202020",
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35
+    paddingHorizontal: 16,
+    height: 60,
+    backgroundColor: '#f5f5f5'
   },
-  hi: {
+  headerDark: {
+    backgroundColor: '#000'
+  },
+  iconContainer: {
+    padding: 8,
+  },
+  iconContainerDark: {
+    // Appliquez des styles spécifiques au mode sombre ici
+    backgroundColor: '#000', // Par exemple, changez la couleur de fond en mode sombre
+  },
+  appName: {
     fontSize: 18,
-    color: '#FFF',
     fontWeight: 'bold',
-    marginTop: 25
   },
-  hiDark: {
-    color: '#fff',
+  appNameDark: {
+    color: '#fff', // Couleur du texte en mode sombre
+  },
+  
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  menu: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    height: height,
+    width: 200, // Adjust the width as needed
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 16,
+    marginTop: 60,
+    elevation: 5,
+  },
+  menuDark: {
+    backgroundColor: '#000'
+  },
+  menuItem: {
+    marginTop: '5%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  menuItemDark: {
+    // Appliquez des styles spécifiques au mode sombre ici
+    backgroundColor: '#000', // Par exemple, changez la couleur de fond en mode sombre
+  },
+  menuText: {
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  menuTextDark: {
+    color: '#fff'
+  },
+  closeButton: {
+    marginTop: '10%',
+    alignSelf: 'flex-end',
+    padding: 10,
+  },
+  closeButtonDark: {
+    color: 'fff'
   },
   card: {
-    width: 300,
-    height: 300,
+    width: 310,
+    height: 220,
     marginRight: 5,
     margin: 8, 
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
+    borderRadius: 15,
     overflow: 'hidden',
     shadowColor: "#000",
     shadowOffset: {
-      width: 12, 
-      height: 23,
+      width: 1200, 
+      height: 2300,
     },
-    shadowOpacity: 45
+    shadowOpacity: 450
   },
   cardDark: {
     borderColor: '#666',
@@ -246,6 +273,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    alignItems: "center",
+    textAlign: "center"
   },
   category: {
     color: '#fff',
@@ -293,22 +322,20 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     marginBottom: 20,
-    
     paddingHorizontal: 20,
+    width: width
   },
   recommendationDark: {
     color: '#fff',
   },
   item: {
     height: 220,
-    width: width,
+    width: 150,
     fontSize: 12,
-    fontWeight: 'bold',
-    elevation: 10,
+    backgroundColor: "#fff",
     marginHorizontal: 2,
     borderRadius: 10,
     marginBottom: 20,
-    padding: 15,
   },
   itemDark: {
     backgroundColor: '#333',
@@ -319,6 +346,7 @@ const styles = StyleSheet.create({
   },
   titleDark: {
     color: '#fff',
+    fontWeight: 'bold',
   },
   text: {
     fontSize: 10,
@@ -331,6 +359,7 @@ const styles = StyleSheet.create({
   price: {
     marginTop: 5,
     fontWeight: 'bold',
+    color: '#fff',
   },
   priceDark: {
     color: '#fff',
