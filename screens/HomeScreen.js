@@ -74,7 +74,7 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false}>
       <View style={[styles.container, isDarkMode && styles.containerDark]}>
         <View style={[styles.header, isDarkMode && styles.headerDark]}>
         <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]} onPress={toggleMenu}>
@@ -160,9 +160,16 @@ const {  height } = Dimensions.get('window');
 
 
 const styles = StyleSheet.create({
+  view: { 
+    flex: 1, 
+    backgroundColor: "#f7f7f7" 
+},
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
+  },
+  viewDark: {
+    backgroundColor: '#000',
   },
   containerDark: {
     backgroundColor: '#000',

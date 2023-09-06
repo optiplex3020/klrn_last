@@ -1,18 +1,18 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import { View } from 'react-native';
-
 import DetailScreen from '../screens/DetailScreen'
 import HomeScreen from '../screens/HomeScreen'
-import ProfileScreen from '../screens/ProfileScreen'
 import SearchScreen from '../screens/SearchScreen'
 import RecipeScreen from '../screens/RecipeScreen'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { createStackNavigator } from '@react-navigation/stack';
-import PostScreen from '../screens/PostScreen';
+import { ThemeContext } from '../Context/ThemeContext'; // Importez le contexte de thème
 
 const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
+    const { isDarkMode } = useContext(ThemeContext); // Obtenez la valeur de isDarkMode depuis le contexte
+
     return(
         <Tab.Navigator 
             tabBarOptions={{
@@ -23,7 +23,7 @@ const BottomTabNavigator = () => {
                     left: 20,
                     right: 20,
                     elevation: 0,
-                    backgroundColor: '#f7f7f7',
+                    backgroundColor: isDarkMode ? '#000' : '#f7f7f7', // Utilisez isDarkMode pour conditionner la couleur de fond
                     borderRadius: 55,
                     height: 90
                 }
@@ -33,7 +33,7 @@ const BottomTabNavigator = () => {
                     height:65,
                     justifyContent:"center",
                     paddingVertical:15,
-                    backgroundColor:"#eff4f0",
+                    backgroundColor: isDarkMode ? '#000' : '#eff4f0', // Utilisez isDarkMode pour conditionner la couleur de fond
                     elevation:2
                 }
             }}
@@ -47,12 +47,13 @@ const BottomTabNavigator = () => {
                         tabBarIcon: ({ focused }) => (
                             <View style={{
                                 position: 'absolute',
-                                top: '50%'
+                                top: '50%',
+                                
                             }}>
                                 <FontAwesome5
                                     name="home"
                                     size={20}
-                                    color={focused ? '#009387' : 'grey'} />
+                                    color={focused ? '#000' : 'grey'} />
                             </View>
                         
                         )
@@ -73,7 +74,7 @@ const BottomTabNavigator = () => {
                                 <FontAwesome5
                                     name="search"
                                     size={20}
-                                    color={focused ? '#009387' : 'grey'} />
+                                    color={focused ? '#000' : 'grey'} />
                             </View>
                         
                         )
@@ -89,12 +90,13 @@ const BottomTabNavigator = () => {
                     tabBarIcon: ({ focused }) => (
                         <View style={{
                             position: 'absolute',
-                            top: '50%'
+                            top: '50%',
+                            
                         }}>
                             <FontAwesome5
                                 name="shopping-cart"
                                 size={20}
-                                color={focused ? '#009387' : 'grey'} />
+                                color={focused ? '#000' : 'grey'} />
                         </View>
                     
                     )
@@ -129,7 +131,7 @@ const screenOptionStyle = {
 const MainStackScreens = () => {
     return(
         <Stack.Navigator screenOptions={screenOptionStyle}>
-            <Stack.Screen name="Acceuil" component={BottomTabNavigator}/>
+            <Stack.Screen name="Accueil" component={BottomTabNavigator}/>
             <Stack.Screen name="Detail" component={DetailScreen} sharedElements={(route) => {
                 return [route.params.post.uid];
                 }}/> 

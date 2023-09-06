@@ -95,7 +95,6 @@ export default RecipeScreen = ({ navigation }) => {
           <FontAwesome name="trash-o" size={20} color="black" />
         </TouchableOpacity>
       </View>
-
     </View>
   );
   
@@ -105,8 +104,8 @@ export default RecipeScreen = ({ navigation }) => {
   return (
     <StripeProvider publishableKey='pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy'>
       <View style={[styles.main, isDarkMode && styles.mainDark]}>
-        <View style={styles.header}>
-          <Text style={[styles.title]}>Panier</Text>
+        <View style={[styles.header, isDarkMode && styles.headerDark]}>
+          <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
         </View>
         {cartItems.length === 0 ? (
           <Text style={styles.emptyCartMessage}>Votre panier est vide.</Text>
@@ -118,18 +117,13 @@ export default RecipeScreen = ({ navigation }) => {
             contentContainerStyle={styles.flatListContainer}
           />
         )}
-
-        <View style={styles.view2}>
-
-        </View>
         <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
         <TouchableOpacity
-          style={[styles.paymentButton]}
+          style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark]}
           onPress={() => handlePayment(totalPrice)}
         >
-          <Text style={[styles.paymentButtonText]}>Payer</Text>
+          <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
         </TouchableOpacity>
-
       </View>
     </StripeProvider>
   );
@@ -150,13 +144,18 @@ const styles = StyleSheet.create({
     height: '12%',
     alignItems: 'center'
   },
-  view2: {
-    marginTop: -1200
+  headerDark: {
+    backgroundColor: "#000",
+    borderBottomWidth: 0.5,
+    borderColor: "#f7f7f7"
   },
   title: {
     marginTop: 50,
     fontWeight: 'bold',
     fontSize: 17
+  },
+  titleDark: {
+    color: "#fff"
   },
   flatListContainer: {
     paddingVertical: 10
@@ -167,6 +166,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%', // Modifier cette ligne
     marginLeft: '4%'
+  },
+
+  productContainerDark: {
+    backgroundColor: "#fff"
   },
   
   productImage: {
@@ -208,10 +211,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 10,
     borderRadius: 5,
-    backgroundColor: "#B0228C"
+    width: "90%",
+    backgroundColor: "#000",
+    alignItems: "center",
+    marginBottom: '7%'
+  },
+  paymentButtonDark: {
+    backgroundColor: "#fff",
   },
   paymentButtonText: {
-    fontWeight: 'bold',
-    fontSize: 16
-  }
+    fontSize: 16,
+    color: '#fff',
+  },
+  paymentButtonTextDark: {
+    color: "black"
+  },
 });
