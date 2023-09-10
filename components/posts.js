@@ -1,3 +1,3 @@
-import firebase from "firebase/compat/app";
+import firebase from 'firebase/compat/app';
 
-export const refPosts = firebase.firestore().collection('post')
+export const refPosts = firebase.firestore().collection('post');

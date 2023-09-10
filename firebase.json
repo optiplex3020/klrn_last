@@ -14,8 +14,8 @@
       ]
     },
     {
-      "source": "payment",
-      "codebase": "stripe",
+      "source": "payment_functions",
+      "codebase": "pay",
       "ignore": [
         "node_modules",
         ".git",
@@ -26,5 +26,6 @@
         "npm --prefix \"$RESOURCE_DIR\" run lint"
       ]
     }
-  ]
+  ],
+  "extensions": {}
 }

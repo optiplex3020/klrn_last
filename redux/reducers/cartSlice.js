@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -14,7 +14,7 @@ const cartSlice = createSlice({
         state.push(newItem);
       }
     },
-    
+
     incrementQuantity: (state, action) => {
       const itemId = action.payload;
       const item = state.find((cartItem) => cartItem.id === itemId);

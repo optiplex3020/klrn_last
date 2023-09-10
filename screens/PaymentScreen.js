@@ -24,30 +24,30 @@ const PaymentScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Effectuer un paiement</Text>
-      <CardField
-        postalCodeEnabled={false}
-        placeholder={{
-          number: 'Numéro de carte',
-          // ...
-        }}
-        cardStyle={{
-          backgroundColor: 'white',
-          // ...
-        }}
-        onCardChange={(cardDetails) => {
-          // Gérez les changements dans les détails de la carte ici
-          console.log("Détails de la carte mis à jour :", cardDetails);
-        }}
-        onFocus={(focusedField) => {
-          // Gérez le focus sur les champs de la carte ici
-          console.log("Focus sur le champ de la carte :", focusedField);
-        }}
-      />
-      {paymentLoading ? (
-        <ActivityIndicator style={styles.loader} />
-      ) : (
-        <Button title="Payer" onPress={handlePayment} />
-      )}
+        <CardField
+          postalCodeEnabled={true}
+          placeholder={{
+            number: 'Numéro de carte',
+            // ...
+          }}
+          cardStyle={{
+            backgroundColor: 'white',
+            // ...
+          }}
+          onCardChange={(cardDetails) => {
+            // Gérez les changements dans les détails de la carte ici
+            console.log("Détails de la carte mis à jour :", cardDetails);
+          }}
+          onFocus={(focusedField) => {
+            // Gérez le focus sur les champs de la carte ici
+            console.log("Focus sur le champ de la carte :", focusedField);
+          }}
+        />
+        {paymentLoading ? (
+          <ActivityIndicator style={styles.loader} />
+        ) : (
+          <Button title="Payer" onPress={handlePayment} />
+        )}
     </View>
   );
 };
