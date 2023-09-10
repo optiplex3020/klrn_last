@@ -7,6 +7,7 @@ import { FirebaseProvider } from './Context/FirebaseContext';
 import { Provider } from 'react-redux';
 import { store } from './redux/store/index';
 import { ThemeProvider } from './Context/ThemeContext';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 
 
@@ -30,11 +31,13 @@ export default function App() {
     <ThemeProvider>
       <FirebaseProvider>
         <UserProvider>
-          <Provider store={store}>
-            <NavigationContainer>
-              <AppStackScreens />
-            </NavigationContainer>
-          </Provider>
+          <StripeProvider>
+            <Provider store={store}>
+              <NavigationContainer>
+                <AppStackScreens />
+              </NavigationContainer>
+            </Provider>
+          </StripeProvider>
         </UserProvider>
       </FirebaseProvider>
     </ThemeProvider>

@@ -22,13 +22,13 @@ export default LoadingScreen = () => {
 
 
                     setUser({
-                        isLoggedIn: true,
+                        isAuthenticated: true,
                         email: userInfo.email,
                         uid: userInfo.uid,
                         username: userInfo.username,
                     })
                 } else {
-                    setUser((state) => ({...state, isLoggedIn: false}));
+                    setUser((state) => ({...state, isAuthenticated: false}));
                 }
                 
             }, 500);

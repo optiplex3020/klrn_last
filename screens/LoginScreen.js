@@ -21,28 +21,6 @@ export default LoginScreen = ({navigation}) => {
         check_textInputChange: false,
         secureTextEntry: true,
     });
-    const textInputChange = (val) => {
-        if( val.length != 0 ) {
-            setData({
-                ...data,
-                email: val,
-                check_textInputChange: true
-            });
-        } else {
-            setData({
-                ...data,
-                email: val,
-                check_textInputChange: false
-            });
-        }
-    }
-    const handlePasswordChange = (val) => {
-       
-            setData({
-                ...data,
-                password: val,
-            });
-        }
     const updateSecureTextEntry = () => {
         setData({
             ...data,
@@ -62,7 +40,7 @@ export default LoginScreen = ({navigation}) => {
             setUser({
                 email: userInfo.email,
                 profilePhotoUrl: userInfo.profilePhotoUrl,
-                isLoggedIn: true,
+                isAuthenticated: true,
             });
         } catch (error) {
             alert(error.message)

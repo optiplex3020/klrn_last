@@ -8,6 +8,7 @@ import RecipeScreen from '../screens/RecipeScreen'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { createStackNavigator } from '@react-navigation/stack';
 import { ThemeContext } from '../Context/ThemeContext'; // Importez le contexte de thème
+import PaymentScreen from '../screens/PaymentScreen';
 
 const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
@@ -135,6 +136,7 @@ const MainStackScreens = () => {
             <Stack.Screen name="Detail" component={DetailScreen} sharedElements={(route) => {
                 return [route.params.post.uid];
                 }}/> 
+            <Stack.Screen name="Payment" component={PaymentScreen}/>
         </Stack.Navigator>
     )
 }

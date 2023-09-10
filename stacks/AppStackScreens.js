@@ -11,9 +11,9 @@ export default AppStackScreens = () => {
 
   return (
     <AppStack.Navigator screenOptions={{ headerShown: false }}>
-      {user.isLoggedIn === null ? (
+      {user.isAuthenticated === false ? (
         <AppStack.Screen name="Loading" component={LoadingScreen} />
-      ) : user.isLoggedIn ? (
+      ) : user.isAuthenticated ? (
         <AppStack.Screen name="Main" component={MainStackScreens} />
       ) : (
         <AppStack.Screen name="Auth" component={AuthStackScreens} />
