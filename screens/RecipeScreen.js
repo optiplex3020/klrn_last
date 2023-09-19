@@ -5,10 +5,50 @@ import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/r
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
 import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
+import firebase from 'firebase/app';
+import 'firebase/functions';
 
-export default RecipeScreen = ({ navigation }) => {
+
+const PaymentComponent = ({ totalPrice }) => {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  useEffect(() => {
+    const handlePayment = async () => {
+      try {
+        // Obtenez une référence à la Firebase Cloud Function
+        const generatePaymentIntent = firebase.functions().httpsCallable('generatePaymentIntent');
+    
+        // Appelez la fonction avec le montant total (totalPrice)
+        const response = await generatePaymentIntent({ totalPrice });
+    
+        // Utilisez le client secret du paiement obtenu de la Firebase Cloud Function
+        await initPaymentSheet({
+          paymentIntentClientSecret: response.data.clientSecret,
+          customFlow: true,
+          merchantDisplayName: 'KoLia Fr',
+        });
+    
+        const { error } = await presentPaymentSheet();
+        if (error) {
+          console.error('Erreur de paiement :', error);
+        } else {
+          console.log('Paiement réussi !');
+          // Ici, vous pouvez vider le panier ou effectuer d'autres actions après le paiement réussi
+        }
+      } catch (e) {
+        console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
+      }
+    };
+
+    handlePayment();
+  }, [totalPrice]);
+
+  return null;
+};
+
+
+const RecipeScreen = () => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-
 
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
@@ -41,31 +81,6 @@ export default RecipeScreen = ({ navigation }) => {
     );
   };
 
-  const handlePayment = async (amount) => {
-    const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  
-    try {
-      // Initialisation du PaymentSheet avec les détails du paiement
-      await initPaymentSheet({
-        paymentIntentClientSecret: 'TON_CLIENT_SECRET', // Obtenu côté serveur depuis Stripe
-        customFlow: true,
-        merchantDisplayName: 'KoLia Fr',
-      });
-  
-      // Présentation du PaymentSheet au client
-      const { error } = await presentPaymentSheet();
-      if (error) {
-        console.error('Erreur de paiement :', error);
-      } else {
-        console.log('Paiement réussi !');
-        // Ici, tu peux vider le panier ou faire d'autres actions après le paiement réussi
-      }
-    } catch (e) {
-      console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
-    }
-  };
-  
-  
 
   let totalPrice = cartItems.reduce((total, item) => {
     const itemTotalPrice = item.prix * item.quantity;
@@ -98,9 +113,6 @@ export default RecipeScreen = ({ navigation }) => {
     </View>
   );
   
-
-  console.log(cartItems);
-
   return (
     <View style={[styles.main, isDarkMode && styles.mainDark]}>
       <View style={[styles.header, isDarkMode && styles.headerDark]}>
@@ -125,13 +137,15 @@ export default RecipeScreen = ({ navigation }) => {
           shadowRadius: 2,
           elevation: 3, // Pour Android
         },]}
-        onPress={() => navigation.navigate("Payment")}
+        onPress={() => handlePayment(totalPrice)}
       >
         <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
       </TouchableOpacity>
+      <PaymentComponent totalPrice={totalPrice} />
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   main: {
@@ -234,3 +248,4 @@ const styles = StyleSheet.create({
     color: "black"
   },
 });
+export default RecipeScreen

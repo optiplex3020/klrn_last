@@ -1,6 +1,8 @@
 import {initializeApp, getApps, getApp} from 'firebase/app';
 import {getAuth} from 'firebase/auth';
 import {getStorage} from 'firebase/storage';
+import firebase from 'firebase/app';
+import 'firebase/functions'; 
 
 const FirebaseKeys = {
 
@@ -20,6 +22,7 @@ const app = getApps.length > 0 ? getApp() : initializeApp(FirebaseKeys);
 
 const storage = getStorage(app);
 export const stripeSecretKey = 'sk_test_51NHsDFIldimfBY6saiXKv9gbaLkmkuniuOwppbXMVbq5spzObeb4GrHq4A1dYNQbdXtI2sojnOfdMdtxF9Q4AQbU00dxHC5Fq8';
+export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy';
 
 
 export const auth = getAuth();
