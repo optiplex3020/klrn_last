@@ -1,20 +1,16 @@
-const functions = require('firebase-functions');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const functions = require("firebase-functions");
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
-exports.generatePaymentIntent = functions.https.onCall(async (data, context) => {
+exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
   try {
-    const { totalPrice } = data; // Récupérez le montant total depuis l'application
-
-    // Créez un paiementIntent avec le montant total et d'autres détails
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalPrice * 100, // Le montant doit être en cents (par exemple, 1000 pour 10 EUR)
-      currency: 'eur',
+      amount: req.body.amount,
+      currency: "eur",
     });
 
-    // Retournez le client secret du paiement
-    return { clientSecret: paymentIntent.client_secret };
+    res.status(200).json({clientSecret: paymentIntent.client_secret});
   } catch (error) {
-    console.error('Erreur lors de la création du paiementIntent :', error);
-    throw new functions.https.HttpsError('internal', 'Erreur lors de la création du paiementIntent');
+    console.error("Error creating payment intent:", error);
+    res.status(500).json({error: "Could not create payment intent"});
   }
 });

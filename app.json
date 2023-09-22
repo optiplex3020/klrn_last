@@ -27,7 +27,8 @@
         "NSCameraUsageDescription": "Allow access to the camera",
         "NSPhotoLibraryUsageDescription": "Allow access to the photo library"
       },
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.airlibre.kolia"
     },
     "android": {
       "adaptiveIcon": {
@@ -39,7 +40,8 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.airlibre.kolia"
     },
     "web": {
       "favicon": "./assets/favicon.png"

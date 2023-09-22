@@ -1,9 +1,9 @@
 {
   "expoServerPort": null,
-  "packagerPort": null,
+  "packagerPort": 19000,
   "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "expoServerNgrokUrl": "https://k7rwxwu.optiplex3020.klrn-last-1.exp.direct",
+  "packagerNgrokUrl": "https://k7rwxwu.optiplex3020.klrn-last-1.exp.direct",
+  "ngrokPid": 10184,
   "webpackServerPort": null
 }

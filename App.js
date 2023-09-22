@@ -31,13 +31,11 @@ export default function App() {
     <ThemeProvider>
       <FirebaseProvider>
         <UserProvider>
-          <StripeProvider publishableKey='pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy'>
-            <Provider store={store}>
-              <NavigationContainer>
-                <AppStackScreens />
-              </NavigationContainer>
-            </Provider>
-          </StripeProvider>
+          <Provider store={store}>
+            <NavigationContainer>
+              <AppStackScreens />
+            </NavigationContainer>
+          </Provider>
         </UserProvider>
       </FirebaseProvider>
     </ThemeProvider>

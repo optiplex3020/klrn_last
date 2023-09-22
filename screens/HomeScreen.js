@@ -190,15 +190,14 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   iconContainerDark: {
-    // Appliquez des styles spécifiques au mode sombre ici
-    backgroundColor: '#000', // Par exemple, changez la couleur de fond en mode sombre
+    backgroundColor: '#000', 
   },
   appName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   appNameDark: {
-    color: '#fff', // Couleur du texte en mode sombre
+    color: '#fff', 
   },
   
   modalContainer: {
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     height: height,
-    width: 200, // Adjust the width as needed
+    width: 200, 
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginRight: 16,
@@ -227,8 +226,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   menuItemDark: {
-    // Appliquez des styles spécifiques au mode sombre ici
-    backgroundColor: '#000', // Par exemple, changez la couleur de fond en mode sombre
+    backgroundColor: '#000', 
   },
   menuText: {
     marginLeft: 10,

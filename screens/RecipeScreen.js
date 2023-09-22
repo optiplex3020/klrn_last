@@ -115,33 +115,35 @@ const RecipeScreen = () => {
   
   return (
     <View style={[styles.main, isDarkMode && styles.mainDark]}>
-      <View style={[styles.header, isDarkMode && styles.headerDark]}>
-        <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
-      </View>
-      {cartItems.length === 0 ? (
-        <Text style={styles.emptyCartMessage}>Votre panier est vide.</Text>
-      ) : (
-        <FlatList
-          data={cartItems}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.flatListContainer}
-        />
-      )}
-      <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
-      <TouchableOpacity
-        style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
-          shadowColor: isDarkMode ? "white" : "black",
-          shadowOffset: { width: 1, height: 3 },
-          shadowOpacity: 0.5,
-          shadowRadius: 2,
-          elevation: 3, // Pour Android
-        },]}
-        onPress={() => handlePayment(totalPrice)}
-      >
-        <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
-      </TouchableOpacity>
-      <PaymentComponent totalPrice={totalPrice} />
+      <StripeProvider publishableKey='pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy'>
+        <View style={[styles.header, isDarkMode && styles.headerDark]}>
+          <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
+        </View>
+        {cartItems.length === 0 ? (
+          <Text style={styles.emptyCartMessage}>Votre panier est vide.</Text>
+        ) : (
+          <FlatList
+            data={cartItems}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.flatListContainer}
+          />
+        )}
+        <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
+        <TouchableOpacity
+          style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
+            shadowColor: isDarkMode ? "white" : "black",
+            shadowOffset: { width: 1, height: 3 },
+            shadowOpacity: 0.5,
+            shadowRadius: 2,
+            elevation: 3, // Pour Android
+          },]}
+          onPress={() => PaymentComponent(totalPrice)}
+        >
+          <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
+        </TouchableOpacity>
+        <PaymentComponent totalPrice={totalPrice} />
+      </StripeProvider>
     </View>
   );
 };
@@ -246,6 +248,9 @@ const styles = StyleSheet.create({
   },
   paymentButtonTextDark: {
     color: "black"
+  },
+  emptyCartMessage: {
+    alignContent: "center",
   },
 });
 export default RecipeScreen
