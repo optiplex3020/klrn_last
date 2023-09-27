@@ -41,7 +41,9 @@ export default DetailScreen = ({ route, navigation }) => {
         <ImageBackground style={styles.backgroundImage} source={{ uri: item.image }}>
           <View style={styles.header}>
             <View style={styles.headerBtn}>
-              <Icon name="arrow-back-ios" size={20} onPress={navigation.goBack} />
+              <TouchableOpacity onPress={navigation.goBack}>
+                <Icon name="arrow-back-ios" size={20}/>
+              </TouchableOpacity>
             </View>
             <View style={styles.headerBtn}>
               <Icon name="favorite" size={20} color={'#FF0000'} />
