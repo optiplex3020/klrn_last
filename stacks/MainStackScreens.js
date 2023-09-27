@@ -7,12 +7,12 @@ import SearchScreen from '../screens/SearchScreen'
 import RecipeScreen from '../screens/RecipeScreen'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { createStackNavigator } from '@react-navigation/stack';
-import { ThemeContext } from '../Context/ThemeContext'; // Importez le contexte de thème
-import PaymentScreen from '../screens/PaymentScreen';
+import { ThemeContext } from '../Context/ThemeContext'; 
+import { TransitionSpecs, HeaderStyleInterpolators } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
-    const { isDarkMode } = useContext(ThemeContext); // Obtenez la valeur de isDarkMode depuis le contexte
+    const { isDarkMode } = useContext(ThemeContext);
 
     return(
         <Tab.Navigator 
@@ -24,7 +24,7 @@ const BottomTabNavigator = () => {
                     left: 20,
                     right: 20,
                     elevation: 0,
-                    backgroundColor: isDarkMode ? '#000' : '#f7f7f7', // Utilisez isDarkMode pour conditionner la couleur de fond
+                    backgroundColor: isDarkMode ? '#000' : '#f7f7f7', 
                     borderRadius: 55,
                     height: 90
                 }
@@ -34,7 +34,7 @@ const BottomTabNavigator = () => {
                     height:65,
                     justifyContent:"center",
                     paddingVertical:15,
-                    backgroundColor: isDarkMode ? '#000' : '#eff4f0', // Utilisez isDarkMode pour conditionner la couleur de fond
+                    backgroundColor: isDarkMode ? '#000' : '#eff4f0', 
                     elevation:2
                 }
             }}
@@ -106,37 +106,38 @@ const BottomTabNavigator = () => {
         </Tab.Navigator>
     );
 };
-
+const customTransition = {
+    gestureDirection: 'vertical',
+    transitionPreset: 'slow',
+    cardStyleInterpolator: ({ current, layouts }) => {
+      return {
+        cardStyle: {
+          transform: [
+            {
+              translateY: current.progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [layouts.screen.height, 0],
+              }),
+            },
+          ],
+        },
+      };
+    },
+  };
+  
 
 const Stack = createStackNavigator();
-const screenOptionStyle = {
-    tabBarLabel:"",
-    header: () => null,
-    cardStyleInterpolator: ({ current: { progress } }) => {
-        return {
-          cardStyle: {
-            transform: [
-              {
-                translateX: progress.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-100, 0],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ],
-          },
-        };
-      },
-    }
-
 const MainStackScreens = () => {
     return(
-        <Stack.Navigator screenOptions={screenOptionStyle}>
+        <Stack.Navigator screenOptions={{
+            tabBarLabel:"",
+            header: () => null,
+            cardStyleInterpolator: customTransition.cardStyleInterpolator,
+            headerStyleInterpolator: HeaderStyleInterpolators.forFade,}}>
             <Stack.Screen name="Accueil" component={BottomTabNavigator}/>
             <Stack.Screen name="Detail" component={DetailScreen} sharedElements={(route) => {
                 return [route.params.post.uid];
                 }}/> 
-            <Stack.Screen name="Payment" component={PaymentScreen}/>
         </Stack.Navigator>
     )
 }
