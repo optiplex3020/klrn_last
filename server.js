@@ -3,7 +3,6 @@ const stripe = require('stripe');
 import {useSelector, useDispatch} from 'react-redux';
 
 // Create a connection to the Stripe API
-stripe.setAppId('YOUR_STRIPE_APP_ID');
 stripe.setApiKey('pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy');
 
 // Function to handle an HTTP request

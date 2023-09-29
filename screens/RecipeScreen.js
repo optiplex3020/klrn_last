@@ -89,25 +89,25 @@ const RecipeScreen = () => {
   
 
   const renderItem = ({ item }) => (
-    <View style={styles.productContainer}>
+    <View style={[styles.productContainer, isDarkMode && styles.darkModeContainer]}>
       <Image
         source={{ uri: item.image }}
-        style={styles.productImage}
+        style={[styles.productImage, isDarkMode && styles.darkModeImage]}
       />
       <View style={styles.productInfoContainer}>
-        <Text style={[styles.productTitle]}>{item.title}</Text>
-        <Text style={[styles.productPrice]}>{item.prix}€</Text>
+        <Text style={[styles.productTitle, isDarkMode && styles.darkModeText]}>{item.title}</Text>
+        <Text style={[styles.productPrice, isDarkMode && styles.darkModeText]}>{item.prix}€</Text>
       </View>
       <View style={styles.quantityContainer}>
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.id)}>
-          <Text style={[styles.quantityButtonText]}>-</Text>
+          <Text style={[styles.quantityButtonText, isDarkMode && styles.darkModeText]}>-</Text>
         </TouchableOpacity>
-        <Text style={[styles.quantityText]}>{item.quantity}</Text>
+        <Text style={[styles.quantityText, isDarkMode && styles.darkModeText]}>{item.quantity}</Text>
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.id)}>
-          <Text style={[styles.quantityButtonText]}>+</Text>
+          <Text style={[styles.quantityButtonText, isDarkMode && styles.darkModeText]}>+</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quantityButton} onPress={() => handleRemove(item.id)}>
-          <FontAwesome name="trash-o" size={20} color="black" />
+          <FontAwesome name="trash-o" size={20} color={isDarkMode ? 'white' : 'black'} />
         </TouchableOpacity>
       </View>
     </View>
@@ -120,7 +120,9 @@ const RecipeScreen = () => {
           <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
         </View>
         {cartItems.length === 0 ? (
-          <Text style={styles.emptyCartMessage}>Votre panier est vide.</Text>
+          <View style={[styles.main, isDarkMode && styles.mainDark]}>
+            <Text style={[styles.emptyCartMessage, isDarkMode && styles.emptyCartMessageDark]}>Votre panier est vide.</Text>
+          </View>
         ) : (
           <FlatList
             data={cartItems}
@@ -166,8 +168,6 @@ const styles = StyleSheet.create({
   },
   headerDark: {
     backgroundColor: "#000",
-    borderBottomWidth: 0.5,
-    borderColor: "#f7f7f7"
   },
   title: {
     marginTop: 50,
@@ -186,6 +186,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%', // Modifier cette ligne
     marginLeft: '4%'
+  },
+  darkModeContainer: {
+    // Styles for the dark mode container
+    backgroundColor: 'black',
+    // Add other dark mode styles here
   },
 
   productContainerDark: {
@@ -251,6 +256,9 @@ const styles = StyleSheet.create({
   },
   emptyCartMessage: {
     alignContent: "center",
+  },
+  emptyCartMessageDark: {
+    color: "white"
   },
 });
 export default RecipeScreen

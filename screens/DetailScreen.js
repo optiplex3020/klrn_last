@@ -54,16 +54,16 @@ export default DetailScreen = ({ route, navigation }) => {
 
       <Animated.View style={[styles.detailsContainer, { opacity: fadeAnim }]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.title}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: isDarkMode ? '#fff' : '#0000' }}>{item.title}</Text>
         </View>
 
-        <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
-        <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
+        <Text style={{ fontSize: 16, color: isDarkMode ? '#fff' : '#0000' }}>{item.lieu}</Text>
+        <Text style={{ marginTop: 20, color: isDarkMode ? '#fff' : '#0000' }}>{item.text}</Text>
 
         <View style={styles.footer}>
           <View>
             <Text style={{ color: '#001dff', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
-            <Text style={{ fontSize: 12, color: '#666666', fontWeight: 'bold' }}>Prix total </Text>
+            <Text style={{ fontSize: 12, color: isDarkMode ? '#000' : '#0000', fontWeight: 'bold' }}>Prix total </Text>
           </View>
           <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.bookNowBtn}>
             <Text style={{ color: '#fff' }}>Ajouter au panier</Text>
@@ -221,8 +221,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     marginRight: 15 
   },
-  facilityText: { 
-    marginLeft: 5, 
-    color: '#666666' 
-},
 });
