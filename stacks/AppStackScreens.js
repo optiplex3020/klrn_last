@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { UserContext } from '../Context/UserContext';
 import LoadingScreen from '../screens/LoadingScreen';
 import MainStackScreens from './MainStackScreens';
-import AuthStackScreens from './AuthStackScreens';
+import FirstStackScreens from './FirstStackScreens';
 
 export default AppStackScreens = () => {
   const AppStack = createStackNavigator();
@@ -16,8 +16,9 @@ export default AppStackScreens = () => {
       ) : user.isAuthenticated ? (
         <AppStack.Screen name="Main" component={MainStackScreens} />
       ) : (
-        <AppStack.Screen name="Auth" component={AuthStackScreens} />
-      )}
+        <AppStack.Screen name="SplashStack" component={FirstStackScreens} />      
+      )
+      }
     </AppStack.Navigator>
   );
 };
