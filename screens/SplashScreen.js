@@ -1,32 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, Easing, Dimensions } from 'react-native';
+import koliaImage from '../assets/pLogo.png'; // Remplacez le chemin par le chemin de votre image
 
 export default function SplashScreen({ navigation }) {
   const startAnimation = useRef(new Animated.Value(0)).current;
-  const contentTransition = useRef(new Animated.Value(Dimensions.get('window').height)).current;
-  const opacityValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current; // Utilisez une échelle pour l'animation de la taille du texte
-  const [showText, setShowText] = useState(false);
 
   useEffect(() => {
-    Animated.timing(opacityValue, {
-      toValue: 10,
-      duration: 100,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    }).start();
-
     setTimeout(() => {
-      setShowText(true);
       Animated.timing(scaleValue, {
-        toValue: 10, // Taille finale du texte (ajustez selon vos besoins)
-        duration: 1000,
+        toValue: 100, // Taille finale du texte (ajustez selon vos besoins)
+        duration: 2000,
         easing: Easing.linear,
         useNativeDriver: false,
       }).start(() => {
         navigation.navigate('Login');
       });
-    }, 5000);
+    }, 2000);
   }, []);
 
   return (
@@ -50,17 +40,15 @@ export default function SplashScreen({ navigation }) {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          {showText && (
-            <Animated.Text
-              style={{
-                color: 'white',
-                transform: [{ scale: scaleValue }], // Utilisez l'échelle pour l'animation de la taille
-                opacity: opacityValue,
-              }}
-            >
-              Kolia
-            </Animated.Text>
-          )}
+          <Animated.Image
+            source={koliaImage} // Utilisez votre image importée
+            style={{
+              width: '100%', // Ajustez la largeur selon vos besoins
+              height: '100%', // Ajustez la hauteur selon vos besoins
+              transform: [{ scale: scaleValue }], // Utilisez l'échelle pour l'animation de la taille
+            }}
+            resizeMode="contain" // Assurez-vous que l'image est ajustée correctement dans le conteneur
+          />
         </Animated.View>
       </Animated.View>
     </View>
