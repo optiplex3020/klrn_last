@@ -1,54 +1,20 @@
-// Import the Stripe API
-const stripe = require('stripe');
-import {useSelector, useDispatch} from 'react-redux';
+const express = require('express');
+const admin = require('firebase-admin');
+const serviceAccount = require('./admin.js'); // Spécifiez le chemin vers votre fichier de configuration Firebase.
 
-// Create a connection to the Stripe API
-stripe.setApiKey('pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy');
+// Initialisation de Firebase Admin
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://airlibre-9c426.firebaseio.com',
+});
 
-// Function to handle an HTTP request
-exports.handler = async (req, res) => {
-  // Check if the request is a POST request
-  if (req.method !== 'POST') {
-    res.status(405).send('Only POST requests are supported');
-    return;
-  }
+// Configuration de votre serveur Express
+const app = express();
 
-  // Parse the request body
-  const body = await req.body.json();
+// Définition de vos routes et d'autres fonctionnalités du serveur
 
-  // Check if the request body contains the necessary information
-  if (!body.amount || !body.currency || !body.cardNumber || !body.expirationDate || !body.cvc) {
-    res.status(400).send('Invalid request body');
-    return;
-  }
-
-  // Get the cart information from Redux
-  const cart = await store.getState().cart;
-  const cartItems = useSelector((state) => state.cart);
-  const totalPrice = cartItems.reduce((total, item) => {
-    const itemTotalPrice = item.prix * item.quantity;
-    return total + itemTotalPrice;
-  }, 0);
-
-  // Make a payment with Stripe
-  const payment = await stripe.charges.create({
-    amount: body.amount,
-    currency: body.currency,
-    card: {
-      number: body.cardNumber,
-      expirationMonth: body.expirationDate.split('/')[0],
-      expirationYear: body.expirationDate.split('/')[1],
-      cvc: body.cvc,
-    },
-    items: cart.items.map((item) => {
-      return {
-        quantity: item.quantity,
-        price: item.price,
-        name: item.name,
-      };
-    }),
-  });
-
-  // Send the response
-  res.status(200).send(payment);
-};
+// Écoute du serveur sur un port
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serveur en cours d'exécution sur le port ${port}`);
+});

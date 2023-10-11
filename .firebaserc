@@ -4,5 +4,11 @@
     "kolia": "airlibre-9c426"
   },
   "targets": {},
-  "etags": {}
+  "etags": {
+    "airlibre-9c426": {
+      "extensionInstances": {
+        "firestore-stripe-payments": "7a835ba81e2b107fdda59b6ada6704c3efe729a1088cdff9e7f84b6b16724e58"
+      }
+    }
+  }
 }
