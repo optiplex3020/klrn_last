@@ -46,7 +46,7 @@ export default DetailScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
             <View style={styles.headerBtn}>
-              <Icon name="favorite" size={20} color={'#FF0000'} />
+              <Icon name="favorite" size={20} color={'#000'} />
             </View>
           </View>
         </ImageBackground>
@@ -54,16 +54,16 @@ export default DetailScreen = ({ route, navigation }) => {
 
       <Animated.View style={[styles.detailsContainer, { opacity: fadeAnim }]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: isDarkMode ? '#fff' : '#0000' }}>{item.title}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: isDarkMode ? '#fff' : '#000' }}>{item.title}</Text>
         </View>
 
-        <Text style={{ fontSize: 16, color: isDarkMode ? '#fff' : '#0000' }}>{item.lieu}</Text>
-        <Text style={{ marginTop: 20, color: isDarkMode ? '#fff' : '#0000' }}>{item.text}</Text>
+        <Text style={{ fontSize: 16, color: isDarkMode ? '#fff' : '#000' }}>{item.lieu}</Text>
+        <Text style={{ marginTop: 20, color: isDarkMode ? '#fff' : '#000' }}>{item.text}</Text>
 
         <View style={styles.footer}>
           <View>
             <Text style={{ color: '#001dff', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
-            <Text style={{ fontSize: 12, color: isDarkMode ? '#000' : '#0000', fontWeight: 'bold' }}>Prix total </Text>
+            <Text style={{ fontSize: 12, color: isDarkMode ? '#000' : '#000', fontWeight: 'bold' }}>Prix total </Text>
           </View>
           <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.bookNowBtn}>
             <Text style={{ color: '#fff' }}>Ajouter au panier</Text>

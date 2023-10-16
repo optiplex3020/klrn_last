@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
-import firebase from 'firebase/app';
-import 'firebase/functions';
+import { useStripe } from '@stripe/stripe-react-native';
+import firebase from "firebase/compat/app";
+import 'firebase/compat/functions';
 
 
 const PaymentComponent = ({ totalPrice }) => {
@@ -16,7 +16,7 @@ const PaymentComponent = ({ totalPrice }) => {
     const handlePayment = async () => {
       try {
         // Obtenez une référence à la Firebase Cloud Function
-        const generatePaymentIntent = firebase.functions().httpsCallable('generatePaymentIntent');
+        const generatePaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
     
         // Appelez la fonction avec le montant total (totalPrice)
         const response = await generatePaymentIntent({ totalPrice });
@@ -39,6 +39,7 @@ const PaymentComponent = ({ totalPrice }) => {
         console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
       }
     };
+    
 
     handlePayment();
   }, [totalPrice]);
@@ -115,41 +116,38 @@ const RecipeScreen = () => {
   
   return (
     <View style={[styles.main, isDarkMode && styles.mainDark]}>
-      <StripeProvider publishableKey='pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy'>
-        <View style={[styles.header, isDarkMode && styles.headerDark]}>
-          <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
+      <View style={[styles.header, isDarkMode && styles.headerDark]}>
+        <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
+      </View>
+      {cartItems.length === 0 ? (
+        <View style={[styles.main, isDarkMode && styles.mainDark]}>
+          <Text style={[styles.emptyCartMessage, isDarkMode && styles.emptyCartMessageDark]}>Votre panier est vide.</Text>
         </View>
-        {cartItems.length === 0 ? (
-          <View style={[styles.main, isDarkMode && styles.mainDark]}>
-            <Text style={[styles.emptyCartMessage, isDarkMode && styles.emptyCartMessageDark]}>Votre panier est vide.</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={cartItems}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.flatListContainer}
-          />
-        )}
-        <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
-        <TouchableOpacity
-          style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
-            shadowColor: isDarkMode ? "white" : "black",
-            shadowOffset: { width: 1, height: 3 },
-            shadowOpacity: 0.5,
-            shadowRadius: 2,
-            elevation: 3, // Pour Android
-          },]}
-          onPress={() => PaymentComponent(totalPrice)}
-        >
-          <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
-        </TouchableOpacity>
-        <PaymentComponent totalPrice={totalPrice} />
-      </StripeProvider>
+      ) : (
+        <FlatList
+          data={cartItems}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.flatListContainer}
+        />
+      )}
+      <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
+      <TouchableOpacity
+        style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
+          shadowColor: isDarkMode ? "white" : "black",
+          shadowOffset: { width: 1, height: 3 },
+          shadowOpacity: 0.5,
+          shadowRadius: 2,
+          elevation: 3, // Pour Android
+        },]}
+        onPress={() => PaymentComponent(totalPrice)}
+      >
+        <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
+      </TouchableOpacity>
+      <PaymentComponent totalPrice={totalPrice} />
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   main: {
