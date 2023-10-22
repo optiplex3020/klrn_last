@@ -9,45 +9,6 @@ import firebase from "firebase/compat/app";
 import 'firebase/compat/functions';
 
 
-const PaymentComponent = ({ totalPrice }) => {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-
-  useEffect(() => {
-    const handlePayment = async () => {
-      try {
-        // Obtenez une référence à la Firebase Cloud Function
-        const generatePaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-    
-        // Appelez la fonction avec le montant total (totalPrice)
-        const response = await generatePaymentIntent({ totalPrice });
-    
-        // Utilisez le client secret du paiement obtenu de la Firebase Cloud Function
-        await initPaymentSheet({
-          paymentIntentClientSecret: response.data.clientSecret,
-          customFlow: true,
-          merchantDisplayName: 'KoLia Fr',
-        });
-    
-        const { error } = await presentPaymentSheet();
-        if (error) {
-          console.error('Erreur de paiement :', error);
-        } else {
-          console.log('Paiement réussi !');
-          // Ici, vous pouvez vider le panier ou effectuer d'autres actions après le paiement réussi
-        }
-      } catch (e) {
-        console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
-      }
-    };
-    
-
-    handlePayment();
-  }, [totalPrice]);
-
-  return null;
-};
-
-
 const RecipeScreen = () => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
 
@@ -81,6 +42,9 @@ const RecipeScreen = () => {
       ]
     );
   };
+
+  
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const handlePayment = async () => {
     try {
@@ -170,8 +134,7 @@ const RecipeScreen = () => {
         onPress={handlePayment}
       >
         <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
-      </TouchableOpacity>
-      <PaymentComponent totalPrice={totalPrice} />
+      </TouchableOpacity> 
     </View>
   );
 };
