@@ -28,7 +28,7 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
       confirm: true,
     });
 
-    res.status(200).json({clientSecret: paymentIntent.client_secret});
+    res.json({clientSecret: paymentIntent.client_secret});
   } catch (error) {
     console.error("Stripe payment error:", error);
     res.status(500).send("Payment failed");
