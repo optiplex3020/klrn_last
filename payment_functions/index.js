@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(functions.config().stripe.secret);
 
 admin.initializeApp();
 
@@ -13,10 +13,10 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     }
 
     // Parsez le corps de la demande
-    const body = JSON.parse(req.body);
+    const body = req.body;
 
-    // Vérifiez que le corps de la demande contient les informations nécessaires
-    if (!body.amount || !body.currency || !body.cardToken) {
+    // Vérifiez que le corp les informations nécessaires
+    if (!body.amount || !body.currency) {
       res.status(400).send("Invalid request body");
       return;
     }
@@ -24,11 +24,10 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: body.amount,
       currency: body.currency,
-      payment_method: body.cardToken,
-      confirm: true,
+      payment_method_types: ["card"],
     });
 
-    res.json({clientSecret: paymentIntent.client_secret});
+    res.status(200).json({clientSecret: paymentIntent.client_secret});
   } catch (error) {
     console.error("Stripe payment error:", error);
     res.status(500).send("Payment failed");

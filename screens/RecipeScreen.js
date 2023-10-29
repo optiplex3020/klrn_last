@@ -1,27 +1,26 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
 import { useStripe } from '@stripe/stripe-react-native';
 import firebase from "firebase/compat/app";
 import 'firebase/compat/functions';
 
-
 const RecipeScreen = () => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
 
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
   };
-  
+
   const handleDecrement = (itemId) => {
     dispatch(decrementQuantity(itemId));
-  };  
+  };
 
   const handleRemove = (itemId) => {
     Alert.alert(
@@ -43,25 +42,22 @@ const RecipeScreen = () => {
     );
   };
 
-  
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-
   const handlePayment = async () => {
     try {
-      // Obtenez une référence à la Firebase Cloud Function
       const generatePaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-  
-      // Appelez la fonction avec le montant total (totalPrice)
-      const response = await generatePaymentIntent({ totalPrice });
-  
-      // Utilisez le client secret du paiement obtenu de la Firebase Cloud Function
+
+      const cartTotalPrice = cartItems.reduce((total, item) => item.prix * item.quantity, 0);
+
+      const response = await generatePaymentIntent({ amount: cartTotalPrice, currency: 'eur' });
+
       await initPaymentSheet({
         paymentIntentClientSecret: response.data.clientSecret,
         customFlow: true,
         merchantDisplayName: 'KoLia Fr',
       });
-  
+
       const { error } = await presentPaymentSheet();
+
       if (error) {
         console.error('Erreur de paiement :', error);
       } else {
@@ -73,12 +69,55 @@ const RecipeScreen = () => {
     }
   };
 
+  const initializePaymentSheet = async () => {
+    try {
+      const {
+        paymentIntent,
+        ephemeralKey,
+        customer,
+        publishableKey,
+      } = await fetchPaymentSheetParams();
 
-  let totalPrice = cartItems.reduce((total, item) => {
-    const itemTotalPrice = item.prix * item.quantity;
-    return total + itemTotalPrice;
-  }, 0);
-  
+      const { error } = await initPaymentSheet({
+        merchantDisplayName: "Example, Inc.",
+        customerId: customer,
+        customerEphemeralKeySecret: ephemeralKey,
+        paymentIntentClientSecret: paymentIntent,
+        allowsDelayedPaymentMethods: true,
+        defaultBillingDetails: {
+          name: 'Jane Doe',
+        }
+      });
+      if (!error) {
+        setLoading(true);
+      }
+    } catch (e) {
+      console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
+    }
+  };
+
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch(`${API_URL}/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const calculateTotalPrice = (items) => {
+    return items.reduce((total, item) => {
+      const itemTotalPrice = item.prix * item.quantity;
+      return total + itemTotalPrice;
+    }, 0);
+  };
 
   const renderItem = ({ item }) => (
     <View style={[styles.productContainer, isDarkMode && styles.darkModeContainer]}>
@@ -104,7 +143,7 @@ const RecipeScreen = () => {
       </View>
     </View>
   );
-  
+
   return (
     <View style={[styles.main, isDarkMode && styles.mainDark]}>
       <View style={[styles.header, isDarkMode && styles.headerDark]}>
@@ -118,11 +157,11 @@ const RecipeScreen = () => {
         <FlatList
           data={cartItems}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.flatListContainer}
         />
       )}
-      <Text style={[styles.totalPrice]}>Prix total: {totalPrice}€</Text>
+      <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
       <TouchableOpacity
         style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
           shadowColor: isDarkMode ? "white" : "black",
@@ -130,14 +169,15 @@ const RecipeScreen = () => {
           shadowOpacity: 0.5,
           shadowRadius: 2,
           elevation: 3, // Pour Android
-        },]}
+        }]}
         onPress={handlePayment}
       >
         <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
-      </TouchableOpacity> 
+      </TouchableOpacity>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   main: {
@@ -167,6 +207,12 @@ const styles = StyleSheet.create({
   },
   flatListContainer: {
     paddingVertical: 10
+  },
+  darkModeText: {
+    color: "#fff"
+  },
+  totalPriceDark: {
+    color: "#fff"
   },
   productContainer: {
     flexDirection: 'row',
