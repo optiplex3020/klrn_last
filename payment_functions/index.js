@@ -8,28 +8,40 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
   try {
     // Vérifiez que la demande est une requête POST
     if (req.method !== "POST") {
-      res.status(405).send("Only POST requests are supported");
+      res.send("Selem, Only POST requests are supported");
       return;
     }
 
-    // Parsez le corps de la demande
-    const body = req.body;
+    const customers = await stripe.customers.list();
 
-    // Vérifiez que le corp les informations nécessaires
-    if (!body.amount || !body.currency) {
-      res.status(400).send("Invalid request body");
-      return;
+    const customer = customers.data[0];
+
+    if (!customer) {
+      return res.send({
+        error: 'manque de bougs carrement',
+      });
     }
+    const ephemeralKey = await stripe.ephemeralKeys.create({
+          customer: customer.id},
+          {apiVersion: "2023-10-16"},
+    )
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: body.amount,
-      currency: body.currency,
-      payment_method_types: ["card"],
+      amount: 200000,
+      currency: "eur",
+      customer: customer.id,
+      automatic_payment_methods: {enabled: true},
+      payment_method_types: [
+        "card",
+      ],
     });
 
-    res.status(200).json({clientSecret: paymentIntent.client_secret});
+    return res.json({
+      paymentIntent: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customer.id,});
   } catch (error) {
     console.error("Stripe payment error:", error);
-    res.status(500).send("Payment failed");
+    res.send("Payment failed");
   }
 });

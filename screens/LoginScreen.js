@@ -88,13 +88,11 @@ export default LoginScreen = ({navigation}) => {
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity onPress={signIn} style={styles.button_o} disabled={loading}>
-                        <LinearGradient colors={['#42e695','#3bb2b8']} style={styles.signIn}>
                         {loading ? (
                                 <Loading />
                             ) : ( 
                                 <Text style={styles.textSign}>Se connecter</Text>
                             )}
-                        </LinearGradient>
                     </TouchableOpacity>
                     <View style={styles.button}>
                         <TouchableOpacity style={{marginTop: 55}} onPress={()=>navigation.navigate('Register')}>
@@ -104,7 +102,6 @@ export default LoginScreen = ({navigation}) => {
                         </TouchableOpacity>
                         <TouchableOpacity style={{marginTop: 20, fontWeight:"bold"}} onPress={()=>navigation.navigate('Changepw')}>
                             <Text style={{color:'#000'}}>Mot de passe oublié ?
-                                <Text style={{color:'#009387'}}> Réinitialisez-le</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -123,7 +120,7 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: '#009387'
+            backgroundColor: '#000'
         },
         header: {
             flex: 1,
@@ -175,7 +172,7 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
         },
         button: {
             alignItems: 'center',
-            marginTop: 50,
+            marginTop: "auto",
             
         },
         signIn: {
@@ -187,13 +184,13 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
         },
         textSign: {
             fontSize: 18,
-            fontWeight: 'bold',
             color: "#fff"
         },
         button_o: {
             marginHorizontal: 5,
-            marginTop: 30,
-            borderRadius: 242,
+            backgroundColor: "#000",
+            marginTop: "30%",
+            borderRadius: 10,
             alignItems: "center",
             height: 52,
             justifyContent: "center",

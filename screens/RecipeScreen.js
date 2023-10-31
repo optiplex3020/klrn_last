@@ -1,18 +1,69 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { useStripe } from '@stripe/stripe-react-native';
+import { useStripe, usePaymentSheet } from '@stripe/stripe-react-native';
 import firebase from "firebase/compat/app";
 import 'firebase/compat/functions';
 
+
 const RecipeScreen = () => {
+  const [ready, setReady] = useState(false);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
+  const { initPaymentSheet, presentPaymentSheet, loading } = usePaymentSheet();
+
+  useEffect(() => {
+    initialisePaymentSheet();
+  });
+
+  const initialisePaymentSheet = async () => {
+    const {paymentIntent, ephemeralKey, customer} = 
+      await fetchPaymentSheetParams();
+
+    const {error} = await initPaymentSheet({
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      merchantDisplayName: 'KoLia Fr',
+      allowsDelayedPaymentMethods: true,
+    });
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      setReady(true);
+    }
+  };
+
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch("https://us-central1-airlibre-9c426.cloudfunctions.net/createPaymentIntent", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const {paymentIntent, ephemeralKey, customer} = await response.json
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const buy = async () => {
+    const {error} = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert('Success', 'The payment was confirmed ');
+      setReady(false);
+    }
+  };
 
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
@@ -40,76 +91,6 @@ const RecipeScreen = () => {
         }
       ]
     );
-  };
-
-  const handlePayment = async () => {
-    try {
-      const generatePaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-
-      const cartTotalPrice = cartItems.reduce((total, item) => item.prix * item.quantity, 0);
-
-      const response = await generatePaymentIntent({ amount: cartTotalPrice, currency: 'eur' });
-
-      await initPaymentSheet({
-        paymentIntentClientSecret: response.data.clientSecret,
-        customFlow: true,
-        merchantDisplayName: 'KoLia Fr',
-      });
-
-      const { error } = await presentPaymentSheet();
-
-      if (error) {
-        console.error('Erreur de paiement :', error);
-      } else {
-        console.log('Paiement réussi !');
-        // Ici, vous pouvez vider le panier ou effectuer d'autres actions après le paiement réussi
-      }
-    } catch (e) {
-      console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
-    }
-  };
-
-  const initializePaymentSheet = async () => {
-    try {
-      const {
-        paymentIntent,
-        ephemeralKey,
-        customer,
-        publishableKey,
-      } = await fetchPaymentSheetParams();
-
-      const { error } = await initPaymentSheet({
-        merchantDisplayName: "Example, Inc.",
-        customerId: customer,
-        customerEphemeralKeySecret: ephemeralKey,
-        paymentIntentClientSecret: paymentIntent,
-        allowsDelayedPaymentMethods: true,
-        defaultBillingDetails: {
-          name: 'Jane Doe',
-        }
-      });
-      if (!error) {
-        setLoading(true);
-      }
-    } catch (e) {
-      console.error('Erreur lors de l\'initialisation du PaymentSheet :', e);
-    }
-  };
-
-  const fetchPaymentSheetParams = async () => {
-    const response = await fetch(`${API_URL}/payment-sheet`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
-
-    return {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    };
   };
 
   const calculateTotalPrice = (items) => {
@@ -170,7 +151,7 @@ const RecipeScreen = () => {
           shadowRadius: 2,
           elevation: 3, // Pour Android
         }]}
-        onPress={handlePayment}
+        onPress={buy}
       >
         <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
       </TouchableOpacity>

@@ -14,7 +14,7 @@ export default function SplashScreen({ navigation }) {
         easing: Easing.linear,
         useNativeDriver: false,
       }).start(() => {
-        navigation.navigate('Login');
+        navigation.navigate('First');
       });
     }, 2000);
   }, []);

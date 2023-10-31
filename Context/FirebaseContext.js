@@ -15,14 +15,19 @@ if (!firebase.apps.length) {
 }
 
 function onAuthStateChange() {
-  return firebase.auth().onAuthStateChanged(user => {
+  return onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("The user is logged in");
+      // L'utilisateur est connecté, vous pouvez enregistrer des données d'authentification
+      await AsyncStorage.setItem('authToken', 'token_d_utilisateur');
+      console.log("L'utilisateur est connecté");
     } else {
-      console.log("The user is not logged in");
+      // L'utilisateur est déconnecté, vous pouvez supprimer les données d'authentification
+      await AsyncStorage.removeItem('authToken');
+      console.log("L'utilisateur est déconnecté");
     }
   });
 }
+
 
 const db = firebase.firestore();
 const auth = getAuth();

@@ -17,23 +17,27 @@ export default function App() {
   const STRIPE_PUBLISHABLE_KEY="pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy";
 
   useEffect(() => {
-      // Vérifier si un token d'authentification est présent dans le stockage local
-      AsyncStorage.getItem('authToken')
+    // Vérifier si un token d'authentification est présent dans le stockage local
+    AsyncStorage.getItem('authToken')
       .then((token) => {
-          if (token) {
-              setIsAuthenticated(true);
-          }
+        if (token) {
+          // L'utilisateur est déjà authentifié, vous pouvez gérer cela ici
+          setIsAuthenticated(true);
+        }
       })
       .catch((error) => {
-          console.error('Error fetching authentication token:', error);
+        console.error('Erreur lors de la récupération du jeton d\'authentification :', error);
       });
   }, []);
+  
 
   return (
     <ThemeProvider>
       <FirebaseProvider>
         <UserProvider>
-          <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+          <StripeProvider
+           publishableKey={STRIPE_PUBLISHABLE_KEY}
+           urlScheme='fr.airlibre.kolia'>
             <Provider store={store}>
               <NavigationContainer>
                 <AppStackScreens />
