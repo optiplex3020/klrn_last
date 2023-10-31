@@ -18,13 +18,13 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
 
     if (!customer) {
       return res.send({
-        error: 'manque de bougs carrement',
+        error: "manque de bougs carrement",
       });
     }
-    const ephemeralKey = await stripe.ephemeralKeys.create({
-          customer: customer.id},
-          {apiVersion: "2023-10-16"},
-    )
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+        {customer: customer.id},
+        {apiVersion: "2023-10-16"},
+    );
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 200000,
@@ -37,9 +37,9 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     });
 
     return res.json({
-      paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
-      customer: customer.id,});
+      clientSecret: paymentIntent.client_secret,
+      customer: customer.id});
   } catch (error) {
     console.error("Stripe payment error:", error);
     res.send("Payment failed");

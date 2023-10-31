@@ -23,7 +23,7 @@ const RecipeScreen = () => {
   const initialisePaymentSheet = async () => {
     const {paymentIntent, ephemeralKey, customer} = 
       await fetchPaymentSheetParams();
-
+  
     const {error} = await initPaymentSheet({
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
@@ -37,6 +37,7 @@ const RecipeScreen = () => {
       setReady(true);
     }
   };
+  
 
   const fetchPaymentSheetParams = async () => {
     const response = await fetch("https://us-central1-airlibre-9c426.cloudfunctions.net/createPaymentIntent", {
@@ -159,7 +160,6 @@ const RecipeScreen = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   main: {
     flex: 1,
@@ -276,4 +276,5 @@ const styles = StyleSheet.create({
     color: "white"
   },
 });
+
 export default RecipeScreen
