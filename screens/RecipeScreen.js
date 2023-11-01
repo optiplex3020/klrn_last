@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { useStripe, usePaymentSheet } from '@stripe/stripe-react-native';
+import { StripeProvider, usePaymentSheet } from '@stripe/stripe-react-native';
 import firebase from "firebase/compat/app";
 import 'firebase/compat/functions';
 
@@ -35,6 +35,10 @@ const RecipeScreen = () => {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
       setReady(true);
+    }
+
+    if (paymentIntent !== `pi_3O7BvbIldimfBY6s1k3N1Gmf_secret_yl6asTFcYIg70KEVbcn6YRsJD`) {
+      throw new Error("Le secret client est incorrect");
     }
   };
   
@@ -126,37 +130,45 @@ const RecipeScreen = () => {
     </View>
   );
 
+  const STRIPE_PUBLISHABLE_KEY="pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy";
+
   return (
-    <View style={[styles.main, isDarkMode && styles.mainDark]}>
-      <View style={[styles.header, isDarkMode && styles.headerDark]}>
-        <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
-      </View>
-      {cartItems.length === 0 ? (
+
+    <StripeProvider
+      publishableKey={STRIPE_PUBLISHABLE_KEY}
+      urlScheme='fr.airlibre.kolia'>
         <View style={[styles.main, isDarkMode && styles.mainDark]}>
-          <Text style={[styles.emptyCartMessage, isDarkMode && styles.emptyCartMessageDark]}>Votre panier est vide.</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={cartItems}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.flatListContainer}
-        />
-      )}
-      <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
-      <TouchableOpacity
-        style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
-          shadowColor: isDarkMode ? "white" : "black",
-          shadowOffset: { width: 1, height: 3 },
-          shadowOpacity: 0.5,
-          shadowRadius: 2,
-          elevation: 3, // Pour Android
-        }]}
-        onPress={buy}
-      >
-        <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
-      </TouchableOpacity>
-    </View>
+          <View style={[styles.header, isDarkMode && styles.headerDark]}>
+            <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
+          </View>
+          {cartItems.length === 0 ? (
+            <View style={[styles.main, isDarkMode && styles.mainDark]}>
+              <Text style={[styles.emptyCartMessage, isDarkMode && styles.emptyCartMessageDark]}>Votre panier est vide.</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={cartItems}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.flatListContainer}
+            />
+          )}
+          <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
+          <TouchableOpacity
+            style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
+              shadowColor: isDarkMode ? "white" : "black",
+              shadowOffset: { width: 1, height: 3 },
+              shadowOpacity: 0.5,
+              shadowRadius: 2,
+              elevation: 3, // Pour Android
+            }]}
+            onPress={buy}
+          >
+            <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
+          </TouchableOpacity>
+      </View>
+    </StripeProvider>
+    
   );
 };
 

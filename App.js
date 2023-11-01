@@ -35,15 +35,11 @@ export default function App() {
     <ThemeProvider>
       <FirebaseProvider>
         <UserProvider>
-          <StripeProvider
-           publishableKey={STRIPE_PUBLISHABLE_KEY}
-           urlScheme='fr.airlibre.kolia'>
-            <Provider store={store}>
-              <NavigationContainer>
-                <AppStackScreens />
-              </NavigationContainer>
-            </Provider> 
-          </StripeProvider>
+          <Provider store={store}>
+            <NavigationContainer>
+              <AppStackScreens />
+            </NavigationContainer>
+          </Provider> 
         </UserProvider>
       </FirebaseProvider>
     </ThemeProvider>

@@ -39,6 +39,7 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     return res.json({
       ephemeralKey: ephemeralKey.secret,
       clientSecret: paymentIntent.client_secret,
+      publishableKey: functions.config().stripe.public_key,
       customer: customer.id});
   } catch (error) {
     console.error("Stripe payment error:", error);
