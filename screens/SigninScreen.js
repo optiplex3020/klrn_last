@@ -58,11 +58,11 @@ export default SigninScreen = ({navigation}) => {
                     <TextInput style={styles.textInput} placeholder="Email" autoCapitalize="none" onChangeText={(val) => textInputChange(val)} />
                     {data.check_textInputChange ?
                     <Animatable.View animation="bounceIn">
-                                            <Feather name="check-circle" color="green" size={20} />
+                        <Feather name="check-circle" color="green" size={20} />
                     </Animatable.View> 
                     : null}
                 </View> 
-                <Text style={[styles.text_footer, {marginTop: 35}]}>Mot de passe</Text>
+                <Text style={[styles.text_footer, {marginTop: 35}]}>Mot r'd'rde passe</Text>
                 <View style={styles.action}>
                     <FontAwesome5 name="lock" color="#05375a" size={20}/>
                     <TextInput style={styles.textInput} placeholder="Mot de passe" autoCapitalize="none" secureTextEntry={data.secureTextEntry ? true : false} onChangeText={(val) => handlePasswordChange(val)} />

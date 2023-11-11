@@ -1,48 +1,32 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const stripe = require("stripe")(functions.config().stripe.secret);
+const stripe = require("stripe")(functions.config().stripe.secret_key);
 
 admin.initializeApp();
 
-exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
+exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   try {
-    // Vérifiez que la demande est une requête POST
-    if (req.method !== "POST") {
-      res.send("Selem, Only POST requests are supported");
-      return;
-    }
+    const customer = await stripe.customers.create({
+      email: "customer@example.com",
+    });
 
-    const customers = await stripe.customers.list();
-
-    const customer = customers.data[0];
-
-    if (!customer) {
-      return res.send({
-        error: "manque de bougs carrement",
-      });
-    }
     const ephemeralKey = await stripe.ephemeralKeys.create(
         {customer: customer.id},
-        {apiVersion: "2023-10-16"},
-    );
+        {apiVersion: "2023-10-16"});
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 200000,
       currency: "eur",
-      customer: customer.id,
       automatic_payment_methods: {enabled: true},
-      payment_method_types: [
-        "card",
-      ],
-    });
+      customer: customer.id});
 
-    return res.json({
+    return {
       ephemeralKey: ephemeralKey.secret,
       clientSecret: paymentIntent.client_secret,
       publishableKey: functions.config().stripe.public_key,
-      customer: customer.id});
+    };
   } catch (error) {
-    console.error("Stripe payment error:", error);
-    res.send("Payment failed");
+    console.error("Erreur de paiement:", error);
+    throw new functions.https.HttpsError("internal", "Erreur de paiement");
   }
 });

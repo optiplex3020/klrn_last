@@ -18,58 +18,58 @@ const RecipeScreen = () => {
 
   useEffect(() => {
     initialisePaymentSheet();
-  });
+  }, []);
 
   const initialisePaymentSheet = async () => {
-    const {paymentIntent, ephemeralKey, customer} = 
-      await fetchPaymentSheetParams();
-  
-    const {error} = await initPaymentSheet({
-      customerId: customer,
-      customerEphemeralKeySecret: ephemeralKey,
-      paymentIntentClientSecret: paymentIntent,
-      merchantDisplayName: 'KoLia Fr',
-      allowsDelayedPaymentMethods: true,
-    });
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      setReady(true);
-    }
+    try {
+      const { paymentIntent, ephemeralKey } = await fetchPaymentSheetParams();
 
-    if (paymentIntent !== `pi_3O7BvbIldimfBY6s1k3N1Gmf_secret_yl6asTFcYIg70KEVbcn6YRsJD`) {
-      throw new Error("Le secret client est incorrect");
+      const { error } = await initPaymentSheet({
+        customerEphemeralKeySecret: ephemeralKey,
+        paymentIntentClientSecret: paymentIntent,
+        merchantDisplayName: 'KoLia Fr',
+        allowsDelayedPaymentMethods: true,
+      });
+
+      if (error) {
+        Alert.alert(`Error code: ${error.code}`, error.message);
+      } else {
+        setReady(true);
+      }
+    } catch (error) {
+      console.error('Erreur d\'initialisation de la feuille de paiement:', error);
     }
   };
-  
 
   const fetchPaymentSheetParams = async () => {
-    const response = await fetch("https://us-central1-airlibre-9c426.cloudfunctions.net/createPaymentIntent", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const {paymentIntent, ephemeralKey, customer} = await response.json
+    try {
+      const response = await firebase.functions().httpsCallable('createPaymentIntent')();
+      const data = response.data;
 
-    return {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    };
+      return {
+        paymentIntent: data.clientSecret,
+        ephemeralKey: data.ephemeralKey,
+      };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des paramètres de la feuille de paiement:', error);
+      throw error;
+    }
   };
 
   const buy = async () => {
-    const {error} = await presentPaymentSheet();
+    try {
+      const { error } = await presentPaymentSheet();
 
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      Alert.alert('Success', 'The payment was confirmed ');
-      setReady(false);
+      if (error) {
+        Alert.alert(`Error code: ${error.code}`, error.message);
+      } else {
+        Alert.alert('Success', 'Le paiement a été confirmé ');
+        setReady(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la présentation de la feuille de paiement:', error);
     }
   };
-
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
   };
@@ -163,6 +163,7 @@ const RecipeScreen = () => {
               elevation: 3, // Pour Android
             }]}
             onPress={buy}
+            //disabled={!ready} // Désactive le bouton si la feuille de paiement n'est pas prête
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>

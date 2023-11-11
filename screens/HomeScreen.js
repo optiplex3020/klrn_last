@@ -50,6 +50,7 @@ const HomeScreen = ({ navigation }) => {
         <Image source={{ uri: item.image }} style={{ width: 150, height: 150, borderRadius: 15 }} />
         <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
         <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.categorie}</Text>
+        <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.type}</Text>
         <Text style={[styles.text, styles.price, isDarkMode && styles.textDark]}>{item.prix}€</Text>
       </Pressable>
     </View>  

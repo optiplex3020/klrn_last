@@ -7,14 +7,11 @@ import { FirebaseProvider } from './Context/FirebaseContext';
 import { Provider } from 'react-redux';
 import { store } from './redux/store/index';
 import { ThemeProvider } from './Context/ThemeContext';
-import { StripeProvider } from '@stripe/stripe-react-native';
 
 
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const STRIPE_PUBLISHABLE_KEY="pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy";
 
   useEffect(() => {
     // Vérifier si un token d'authentification est présent dans le stockage local

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image, SafeAreaView, StatusBar, Pressable, } from 'react-native'
+import { StyleSheet, Text, View, Image, SafeAreaView, StatusBar, Pressable, TouchableOpacity, } from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable'
@@ -48,12 +48,20 @@ export default FirstScreen = ({navigation}) => {
               justifyContent: 'flex-end',
               paddingBottom: 40,
             }}>
+              <Animatable.View
+                animation="bounceIn" // Animation de pression
+                duration={500} // Durée de l'animation
+                delay={200} // Délai avant le début de l'animation
+                style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 40 }}
+              >
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                  <View style={style.btn}>
+                    <Text style={{color: 'white'}}>Commencer</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animatable.View>
             {/* button */}
-            <Pressable onPress={() => navigation.navigate('Login')}>
-              <View style={style.btn}>
-                <Text style={{color: 'white'}}>Commancer</Text>
-              </View>
-            </Pressable>
+            
           </View>
         </SafeAreaView>
       );

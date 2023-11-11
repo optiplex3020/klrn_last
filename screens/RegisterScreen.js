@@ -6,7 +6,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import styled from 'styled-components'
 import { ActivityIndicator } from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/compat/auth';
 import db from '../firebase/db';
 import firebase from "firebase/compat/app";
 

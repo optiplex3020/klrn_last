@@ -15,9 +15,6 @@ const FirebaseKeys = {
   appId: '1:62824552496:web:281a39bdfbe36648d0b5f5',
   measurementId: 'G-50F0VRXX17',
 };
-if (!getApps().length) {
-  initializeApp(FirebaseKeys);
-}
 const app = getApps.length > 0 ? getApp() : initializeApp(FirebaseKeys);
 
 const storage = getStorage(app);

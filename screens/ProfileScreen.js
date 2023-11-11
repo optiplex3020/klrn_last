@@ -2,7 +2,7 @@ import React, {useContext} from "react";
 import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {UserContext} from '../Context/UserContext'
 import {FirebaseContext} from '../Context/FirebaseContext'
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut } from "firebase/compat/auth";
 
 
 export default  ProfileScreen = ({navigation}) => {
