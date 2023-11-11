@@ -14,8 +14,11 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
         {customer: customer.id},
         {apiVersion: "2023-10-16"});
 
+    const cartTotal = calculateCartTotal(data.cart);
+
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 200000,
+      amount: cartTotal * 100,
       currency: "eur",
       automatic_payment_methods: {enabled: true},
       customer: customer.id});
@@ -30,3 +33,10 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("internal", "Erreur de paiement");
   }
 });
+
+const calculateCartTotal = (cart) => {
+  return cart.reduce((total, item) => {
+    const itemTotalPrice = item.prix * item.quantity;
+    return total + itemTotalPrice;
+  }, 0);
+};

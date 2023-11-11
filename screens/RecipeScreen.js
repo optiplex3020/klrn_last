@@ -43,9 +43,9 @@ const RecipeScreen = () => {
 
   const fetchPaymentSheetParams = async () => {
     try {
-      const response = await firebase.functions().httpsCallable('createPaymentIntent')();
+      const response = await firebase.functions().httpsCallable('createPaymentIntent')({ cart: cartItems }); // Envoyer le panier à la fonction Cloud Functions
       const data = response.data;
-
+  
       return {
         paymentIntent: data.clientSecret,
         ephemeralKey: data.ephemeralKey,
@@ -55,6 +55,7 @@ const RecipeScreen = () => {
       throw error;
     }
   };
+  
 
   const buy = async () => {
     try {
