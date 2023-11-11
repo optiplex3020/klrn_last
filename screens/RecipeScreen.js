@@ -17,10 +17,10 @@ const RecipeScreen = () => {
   const { initPaymentSheet, presentPaymentSheet, loading } = usePaymentSheet();
 
   useEffect(() => {
-    initialisePaymentSheet();
-  }, []);
+    updatePaymentSheet();
+  }, [cartItems]);
 
-  const initialisePaymentSheet = async () => {
+  const updatePaymentSheet = async () => {
     try {
       const { paymentIntent, ephemeralKey } = await fetchPaymentSheetParams();
 
@@ -32,15 +32,36 @@ const RecipeScreen = () => {
       });
 
       if (error) {
-        Alert.alert(`Error code: ${error.code}`, error.message);
+        Alert.alert(`Code d'erreur : ${error.code}`, error.message);
       } else {
         setReady(true);
       }
     } catch (error) {
-      console.error('Erreur d\'initialisation de la feuille de paiement:', error);
+      console.error('Erreur d\'initialisation de la feuille de paiement :', error);
     }
   };
 
+  const buy = async () => {
+    try {
+      if (!ready) {
+        // Assurez-vous que la feuille de paiement est prête avant d'effectuer un paiement
+        Alert.alert('Erreur', 'La feuille de paiement n\'est pas prête');
+        return;
+      }
+
+      const { error } = await presentPaymentSheet();
+
+      if (error) {
+        Alert.alert(`Code d'erreur : ${error.code}`, error.message);
+      } else {
+        Alert.alert('Succès', 'Le paiement a été confirmé ');
+        setReady(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la présentation de la feuille de paiement :', error);
+    }
+  };
+  
   const fetchPaymentSheetParams = async () => {
     try {
       const response = await firebase.functions().httpsCallable('createPaymentIntent')({ cart: cartItems }); // Envoyer le panier à la fonction Cloud Functions
@@ -56,21 +77,6 @@ const RecipeScreen = () => {
     }
   };
   
-
-  const buy = async () => {
-    try {
-      const { error } = await presentPaymentSheet();
-
-      if (error) {
-        Alert.alert(`Error code: ${error.code}`, error.message);
-      } else {
-        Alert.alert('Success', 'Le paiement a été confirmé ');
-        setReady(false);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la présentation de la feuille de paiement:', error);
-    }
-  };
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
   };
