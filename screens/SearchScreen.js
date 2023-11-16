@@ -1,18 +1,25 @@
-import React, { useState, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, TextInput } from 'react-native';
+import React, { useState, useContext, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, Modal } from 'react-native';
 import { ThemeContext } from '../Context/ThemeContext';
+import * as Animatable from 'react-native-animatable';  // Utilisez * as Animatable pour importer toutes les composantes Animatable
+import { Image } from 'react-native';  // Assurez-vous que l'importation de Image est correcte
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-export default SearchScreen = () => {
+export default SearchScreen = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const navigation = useNavigation();
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleClose = () => {
+    setIsSearching(false);
+  };
 
   const handleSearch = () => {
+    setIsSearching(true);
     firebase
       .firestore()
       .collection('post')
@@ -23,13 +30,23 @@ export default SearchScreen = () => {
         setSearchResults(results);
       });
   };
+  const imageRef = useRef(null);
+
+  const handlePress = () => {
+    imageRef.current.animate('pulse', 500);
+    navigation.navigate('Detail', { item: item });
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[styles.itemContainer, isDarkMode && styles.itemContainerDark]}
-      onPress={() => navigation.navigate('Detail', { item: item })}
-    >
-      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      onPress={handlePress}>
+      <Animatable.Image
+        source={{ uri: item.image }}
+        style={styles.itemImage}
+        animation="fadeIn"
+        ref={imageRef}
+      />
       <View style={styles.itemInfoContainer}>
         <Text style={[styles.itemTitle, isDarkMode && styles.itemTitleDark]}>{item.title}</Text>
         <Text style={[styles.itemDescription, isDarkMode && styles.itemDescriptionDark]}>
@@ -52,12 +69,19 @@ export default SearchScreen = () => {
           <AntDesign name="search1" size={24} color={isDarkMode ? '#fff' : '#000'} />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={searchResults}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.flatListContainer}
-      />
+      <Modal visible={isSearching} animationType="slide">
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+            <AntDesign name="close" size={24} color={isDarkMode ? '#fff' : '#000'} />
+          </TouchableOpacity>
+          <FlatList
+            data={searchResults}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.flatListContainer}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };

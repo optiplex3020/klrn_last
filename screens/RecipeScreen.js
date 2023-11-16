@@ -14,7 +14,7 @@ const RecipeScreen = () => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
-  const { initPaymentSheet, presentPaymentSheet, loading } = usePaymentSheet();
+  const { initPaymentSheet, presentPaymentSheet } = usePaymentSheet();
 
   useEffect(() => {
     updatePaymentSheet();
@@ -170,7 +170,7 @@ const RecipeScreen = () => {
               elevation: 3, // Pour Android
             }]}
             onPress={buy}
-            //disabled={!ready} // Désactive le bouton si la feuille de paiement n'est pas prête
+            disabled={!ready} // Désactive le bouton si la feuille de paiement n'est pas prête
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>

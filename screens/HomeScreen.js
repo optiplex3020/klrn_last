@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Dimensions, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firebase from 'firebase/compat/app';
 import { ThemeContext } from '../Context/ThemeContext';
@@ -7,8 +7,9 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 require('firebase/compat/firestore');
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => {  
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [post, setPost] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [lastDoc, setLastDoc] = useState(null);
@@ -20,7 +21,7 @@ const HomeScreen = ({ navigation }) => {
   };
   const getPosts = async () => {
     setLoading(true);
-    const snapshot = await refPosts.orderBy('title', 'desc').limit(20).get();
+    const snapshot = await refPosts.orderBy('title').limit(20).get();
     if (!snapshot.empty) {
       let newPosts = [];
       setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
@@ -37,6 +38,64 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     getPosts();
   }, []);
+
+      const [categoryPosts, setCategoryPosts] = useState([]);
+ 
+      const [categories, setCategories] = useState([]);
+      const [filteredPosts, setFilteredPosts] = useState([]);
+      const [categoryAnimation, setCategoryAnimation] = useState(new Animated.Value(0));
+    
+      const getCategories = async () => {
+        const snapshot = await refPosts.orderBy('categorie').get();
+        if (!snapshot.empty) {
+          let newCategories = Array.from(new Set(snapshot.docs.map((doc) => doc.data().categorie))).sort();
+          setCategories(newCategories);
+        } else {
+          setCategories([]);
+        }
+      };
+    
+      useEffect(() => {
+        getCategories();
+      }, []);
+    
+      const showCategoryItems = (category) => {
+        if (selectedCategory === category) {
+          // Si la catégorie sélectionnée est la même que celle déjà sélectionnée,
+          // désélectionnez-la en réinitialisant les éléments filtrés
+          hideCategoryItems();
+        } else {
+          setSelectedCategory(category);
+          // Mise à jour de l'état filteredPosts avec les items correspondant à la catégorie
+          setFilteredPosts(post.filter((p) => p.categorie === category));
+        }
+      };
+      
+      const hideCategoryItems = () => {
+        setSelectedCategory(null);
+        setFilteredPosts([]); // Réinitialiser les articles filtrés à un tableau vide
+      };
+      
+      
+
+   
+
+  const renderCategoryIcon = (category) => {
+    const categoryIcons = {
+      Américain: 'car-outline',
+      Européen: 'book-outline',
+      indien: 'musical-notes-outline',
+      Snack: 'football-outline',
+    };
+    return (
+      <Ionicons
+        name={categoryIcons[category] || 'help-circle-outline'}
+        size={24}
+        color={category === selectedCategory ? 'white' : 'black'}
+      />
+    );
+  };
+
 
   const renderItem = ({ item }) => (
     <View>
@@ -118,6 +177,21 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </Modal>
         </View>
+       <FlatList
+         data={categories}
+         horizontal
+         showsHorizontalScrollIndicator={false}
+         keyExtractor={(item) => item}
+         renderItem={({ item }) => (
+           <Pressable
+             style={[styles.category1, item === selectedCategory && styles.categorySelected]}
+             onPress={() => showCategoryItems(item)}
+           >
+             {/* Remplacement du texte par l'icône de la catégorie */}
+             {renderCategoryIcon(item)}
+           </Pressable>
+         )}
+       />
         <View style={styles.recommendationContainer}>
           <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
             Voyagez dès maintenant
@@ -140,7 +214,7 @@ const HomeScreen = ({ navigation }) => {
         </Text>
         <FlatList
           columnWrapperStyle={{ justifyContent: 'space-between' }}
-          data={post}
+          data={filteredPosts.length > 0 ? filteredPosts : post} // Utilisation de la donnée conditionnelle
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingHorizontal: 20,
@@ -380,6 +454,66 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#000',
     fontWeight: 'bold',
+  },
+  category1: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E0E0E0',
+  },
+  categorySelected: {
+    backgroundColor: '#FFA500',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#00000080',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: Dimensions.get('window').width * 0.9,
+    padding: 10,
+    backgroundColor: '#FFA500',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  itemContainer: {
+    width: Dimensions.get('window').width * 0.9,
+    height: 200,
+    margin: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  itemImage: {
+    width: '100%',
+    height: '70%',
+  },
+  itemDetails: {
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  itemPrice: {
+    fontSize: 14,
+    color: 'green',
   },
 });
 

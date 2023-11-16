@@ -1,7 +1,6 @@
 import React, {useState, useContext} from 'react';
 import { View, Text, StyleSheet, Platform, Dimensions, Button, TextInput, TouchableOpacity } from 'react-native'
 import { Feather, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import {LinearGradient} from 'expo-linear-gradient';
 import styled from 'styled-components';
 import {Ionicons} from '@expo/vector-icons';
 import {UserContext} from '../Context/UserContext'
@@ -39,7 +38,6 @@ export default LoginScreen = ({navigation}) => {
 
             setUser({
                 email: userInfo.email,
-                profilePhotoUrl: userInfo.profilePhotoUrl,
                 isAuthenticated: true,
             });
         } catch (error) {

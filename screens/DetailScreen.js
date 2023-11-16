@@ -1,39 +1,54 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { ImageBackground, SafeAreaView, View, Text, Modal, TextInput, TouchableHighlight, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Animated } from 'react-native';
+import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
+import NumericInput from 'react-native-numeric-input';
 import { ThemeContext } from '../Context/ThemeContext';
 
 export default DetailScreen = ({ route, navigation }) => {
-  const [isQuantityValid, setIsQuantityValid] = useState(true);
+  const [showMessage, setShowMessage] = useState(false);
+  const [value, setValue] = useState(0);
   const dispatch = useDispatch();
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [modalVisible, setModalVisible] = useState(false);
-  const [quantityInput, setQuantityInput] = useState('');
+  const cartItems = useSelector((state) => state.cart);
 
-  const handleAddToCart = (item) => {
-    const parsedQuantity = parseInt(quantityInput);
-    if (parsedQuantity >= 1 && parsedQuantity <= 30) {
-      dispatch(addToCart({ ...item, quantity: parsedQuantity }));
-      setModalVisible(false);
-      setIsQuantityValid(true); // Quantité valide
-    } else {
-      // Quantité non valide, le bouton reste désactivé
-      setIsQuantityValid(false);
-    }
+
+  const handleAddToCart = (item, quantity) => {
+    dispatch(addToCart({ ...item, quantity }));
+    setShowMessage(true);
+
+    // Réinitialiser le message après quelques secondes
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 3000);
   };
+  
+  const toastConfig = {
+    // ...
+    cart: ({ name, price, ...props }) => (
+      <View style={{ height: 60, width: '100%', backgroundColor: 'white' }}>
+        <Text>Produit ajouté au panier!</Text>
+        <Text>{name}</Text>
+        <Text>{price}€</Text>
+      </View>
+    ),
+  };
+  
+  
 
   const { item } = route.params;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 100,
+      duration: 1000,
       useNativeDriver: true,
     }).start();
   }, []);
+
 
   return (
     <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
@@ -41,12 +56,10 @@ export default DetailScreen = ({ route, navigation }) => {
         <ImageBackground style={styles.backgroundImage} source={{ uri: item.image }}>
           <View style={styles.header}>
             <View style={styles.headerBtn}>
-              <TouchableOpacity onPress={navigation.goBack}>
-                <Icon name="arrow-back-ios" size={20}/>
-              </TouchableOpacity>
+              <Icon name="arrow-back-ios" size={20} onPress={navigation.goBack} />
             </View>
             <View style={styles.headerBtn}>
-              <Icon name="favorite" size={20} color={'#000'} />
+              <Icon name="favorite" size={20} color={'#FF0000'} />
             </View>
           </View>
         </ImageBackground>
@@ -54,55 +67,44 @@ export default DetailScreen = ({ route, navigation }) => {
 
       <Animated.View style={[styles.detailsContainer, { opacity: fadeAnim }]}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: isDarkMode ? '#fff' : '#000' }}>{item.title}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.title}</Text>
         </View>
 
-        <Text style={{ fontSize: 16, color: isDarkMode ? '#fff' : '#000' }}>{item.lieu}</Text>
-        <Text style={{ marginTop: 20, color: isDarkMode ? '#fff' : '#000' }}>{item.text}</Text>
+        {/* Location text */}
+        <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
+        <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
+
+        <NumericInput
+          maxValue={20}
+          value={value}
+          marginTop={2000}
+          onChange={setValue}
+          minValue={1}
+          valueType="integer"
+          totalWidth={100}
+          totalHeight={40}
+          rounded
+          textColor="#000"
+          iconStyle={{ color: 'black' }}
+          rightButtonBackgroundColor="#transparent"
+          leftButtonBackgroundColor="transparent"
+        />
+        
+        {showMessage && (
+          <View style={styles.alertContainer}>
+            <Text style={styles.alertText}>Produit ajouté au panier!</Text>
+          </View>
+        )}
 
         <View style={styles.footer}>
           <View>
             <Text style={{ color: '#001dff', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
-            <Text style={{ fontSize: 12, color: isDarkMode ? '#000' : '#000', fontWeight: 'bold' }}>Prix total </Text>
           </View>
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.bookNowBtn}>
+          <TouchableOpacity onPress={() => handleAddToCart(item, value)} style={styles.bookNowBtn}>
             <Text style={{ color: '#fff' }}>Ajouter au panier</Text>
           </TouchableOpacity>
-        </View>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text>Saisissez la quantité (1-30)</Text>
-              <TextInput
-                style={styles.modalInput}
-                onChangeText={(text) => {
-                  setQuantityInput(text);
-                  setIsQuantityValid(true); // Réinitialise l'état à true
-                }}
-                value={quantityInput}
-                keyboardType="numeric"
-                placeholder="Quantité"
-              />
-              <TouchableHighlight
-                style={[styles.modalButton, !isQuantityValid && styles.disabledButton]}
-                onPress={() => {
-                  handleAddToCart(item);
-                }}
-                disabled={!isQuantityValid}
-              >
-                <Text style={{ color: '#fff' }}>Ajouter</Text>
-              </TouchableHighlight>
-            </View>
-          </View>
-        </Modal>
+        </View>
       </Animated.View>
     </SafeAreaView>
   );
@@ -145,53 +147,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  disabledButton: {
-    backgroundColor: '#ccc', // Couleur de fond grise pour le bouton désactivé
-  },
-
-  modalContainer: {
-    flex: 1,
+  ratingTag: {
+    height: 30,
+    width: 35,
+    backgroundColor: '#001dff',
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
+  virtualTag: {
+    top: -20,
+    width: 120,
     borderRadius: 10,
-    width: 300,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  modalButton: {
+    height: 40,
+    paddingHorizontal: 20,
     backgroundColor: '#000',
-    borderRadius: 5,
-    padding: 10,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  modalHeaderText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  modalButton: {
-    backgroundColor: '#505050',
-    borderRadius: 5,
-    padding: 10,
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 5,
+  interiorImage: {
+    width: width / 3 - 20,
+    height: 80,
+    marginRight: 10,
+    borderRadius: 10,
   },
   footer: {
     height: 70,
@@ -214,11 +192,30 @@ const styles = StyleSheet.create({
   },
   detailsContainer: { 
     flex: 1, 
-    paddingHorizontal: 20,
-     marginTop: 40 
+    paddingHorizontal: 20, 
+    marginTop: 40 
   },
   facility: { 
     flexDirection: 'row', 
     marginRight: 15 
   },
+  facilityText: { 
+    marginLeft: 5, 
+    color: '#666666' 
+  },
+  alertContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    backgroundColor: '#4CAF50', // Couleur de fond de l'alerte (vert ici)
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertText: {
+    color: '#fff', // Couleur du texte de l'alerte (blanc ici)
+    fontSize: 16,
+  },
+  
 });
