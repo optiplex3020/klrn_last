@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Animated } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
 import NumericInput from 'react-native-numeric-input';
 import { ThemeContext } from '../Context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons'; 
+
 
 export default DetailScreen = ({ route, navigation }) => {
   const [showMessage, setShowMessage] = useState(false);
@@ -13,14 +13,12 @@ export default DetailScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const cartItems = useSelector((state) => state.cart);
 
 
   const handleAddToCart = (item, quantity) => {
     dispatch(addToCart({ ...item, quantity }));
     setShowMessage(true);
 
-    // Réinitialiser le message après quelques secondes
     setTimeout(() => {
       setShowMessage(false);
     }, 3000);
@@ -56,10 +54,10 @@ export default DetailScreen = ({ route, navigation }) => {
         <ImageBackground style={styles.backgroundImage} source={{ uri: item.image }}>
           <View style={styles.header}>
             <View style={styles.headerBtn}>
-              <Icon name="arrow-back-ios" size={20} onPress={navigation.goBack} />
+            <Ionicons name="arrow-back" size={20} onPress={navigation.goBack} /> 
             </View>
             <View style={styles.headerBtn}>
-              <Icon name="favorite" size={20} color={'#FF0000'} />
+              <Ionicons name="heart" size={20} color={'#FF0000'} /> 
             </View>
           </View>
         </ImageBackground>
@@ -103,7 +101,6 @@ export default DetailScreen = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => handleAddToCart(item, value)} style={styles.bookNowBtn}>
             <Text style={{ color: '#fff' }}>Ajouter au panier</Text>
           </TouchableOpacity>
-
         </View>
       </Animated.View>
     </SafeAreaView>
@@ -204,14 +201,13 @@ const styles = StyleSheet.create({
     color: '#666666' 
   },
   alertContainer: {
-    position: 'absolute',
     top: 20,
-    left: 0,
-    right: 0,
     backgroundColor: '#4CAF50', // Couleur de fond de l'alerte (vert ici)
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 60,
+    width: "80%"
   },
   alertText: {
     color: '#fff', // Couleur du texte de l'alerte (blanc ici)

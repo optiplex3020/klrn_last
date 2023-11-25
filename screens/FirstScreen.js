@@ -40,28 +40,24 @@ export default FirstScreen = ({navigation}) => {
               <Text style={style.textStyle}>en seulement quelques clics</Text>
             </View>
           </View>
-    
-          {/* Button container */}
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              paddingBottom: 40,
-            }}>
-              <Animatable.View
-                animation="bounceIn" // Animation de pression
-                duration={500} // Durée de l'animation
-                delay={200} // Délai avant le début de l'animation
-                style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 40 }}
-              >
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                  <View style={style.btn}>
-                    <Text style={{color: 'white'}}>Commencer</Text>
-                  </View>
-                </TouchableOpacity>
-              </Animatable.View>
-            {/* button */}
-            
+          <View style={{ flex: 1, marginTop: 20 }}>
+            <Animatable.View
+              animation="bounceIn" 
+              duration={500} 
+              delay={200} 
+              style={{ flex: 1, paddingBottom: 40 }}
+            >
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <View style={style.btn}>
+                  <Text style={{color: 'white'}}>Commencer</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <View style={style.btn2}>
+                  <Text style={{color: 'black'}}>S'inscrire</Text>
+                </View>
+              </TouchableOpacity>
+            </Animatable.View>
           </View>
         </SafeAreaView>
       );
@@ -79,6 +75,17 @@ export default FirstScreen = ({navigation}) => {
         marginHorizontal: 20,
         backgroundColor: 'black',
         borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+      },
+      btn2: {
+        height: 60,
+        marginHorizontal: 20,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        borderColor: 'black',
+        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
       },

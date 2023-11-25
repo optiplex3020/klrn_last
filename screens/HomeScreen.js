@@ -16,9 +16,21 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(null);
   const refPosts = firebase.firestore().collection('post');
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [categoryPosts, setCategoryPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [categoryAnimation, setCategoryAnimation] = useState(new Animated.Value(0));
   const toggleMenu = () => {
     setMenuVisible(!isMenuVisible);
   };
+  useEffect(() => {
+    getPosts();
+  }, []);
+  
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   const getPosts = async () => {
     setLoading(true);
     const snapshot = await refPosts.orderBy('title').limit(20).get();
@@ -35,67 +47,50 @@ const HomeScreen = ({ navigation }) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    getPosts();
-  }, []);
 
-      const [categoryPosts, setCategoryPosts] = useState([]);
- 
-      const [categories, setCategories] = useState([]);
-      const [filteredPosts, setFilteredPosts] = useState([]);
-      const [categoryAnimation, setCategoryAnimation] = useState(new Animated.Value(0));
     
-      const getCategories = async () => {
-        const snapshot = await refPosts.orderBy('categorie').get();
-        if (!snapshot.empty) {
-          let newCategories = Array.from(new Set(snapshot.docs.map((doc) => doc.data().categorie))).sort();
-          setCategories(newCategories);
-        } else {
-          setCategories([]);
-        }
-      };
-    
-      useEffect(() => {
-        getCategories();
-      }, []);
-    
-      const showCategoryItems = (category) => {
-        if (selectedCategory === category) {
-          // Si la catégorie sélectionnée est la même que celle déjà sélectionnée,
-          // désélectionnez-la en réinitialisant les éléments filtrés
-          hideCategoryItems();
-        } else {
-          setSelectedCategory(category);
-          // Mise à jour de l'état filteredPosts avec les items correspondant à la catégorie
-          setFilteredPosts(post.filter((p) => p.categorie === category));
-        }
-      };
-      
-      const hideCategoryItems = () => {
-        setSelectedCategory(null);
-        setFilteredPosts([]); // Réinitialiser les articles filtrés à un tableau vide
-      };
+  const getCategories = async () => {
+    const snapshot = await refPosts.orderBy('categorie').get();
+    if (!snapshot.empty) {
+      let newCategories = Array.from(new Set(snapshot.docs.map((doc) => doc.data().categorie))).sort();
+      setCategories(newCategories);
+    } else {
+      setCategories([]);
+    }
+  };
+
+
+  const showCategoryItems = (category) => {
+    if (selectedCategory === category) {
+      hideCategoryItems();
+    } else {
+      setSelectedCategory(category);
+      setFilteredPosts(post.filter((p) => p.categorie === category));
+    }
+  };
+  
+  const hideCategoryItems = () => {
+    setSelectedCategory(null);
+    setFilteredPosts([]); 
+  };
       
       
 
    
 
   const renderCategoryIcon = (category) => {
-    const categoryIcons = {
-      Américain: 'car-outline',
-      Européen: 'book-outline',
-      indien: 'musical-notes-outline',
-      Snack: 'football-outline',
-    };
     return (
-      <Ionicons
-        name={categoryIcons[category] || 'help-circle-outline'}
-        size={24}
-        color={category === selectedCategory ? 'white' : 'black'}
-      />
+      <Pressable
+        style={[
+          styles.category1,
+          category === selectedCategory && styles.categorySelected,
+        ]}
+        onPress={() => showCategoryItems(category)}
+      >
+        <Text style={styles.categoryText}>{category}</Text>
+      </Pressable>
     );
   };
-
 
   const renderItem = ({ item }) => (
     <View>
@@ -187,7 +182,6 @@ const HomeScreen = ({ navigation }) => {
              style={[styles.category1, item === selectedCategory && styles.categorySelected]}
              onPress={() => showCategoryItems(item)}
            >
-             {/* Remplacement du texte par l'icône de la catégorie */}
              {renderCategoryIcon(item)}
            </Pressable>
          )}
@@ -231,7 +225,7 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const width = Dimensions.get('screen').width / 2;
-const {  height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 
 const styles = StyleSheet.create({
@@ -394,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: -10
   },
   recommendationContainer: {
-    marginTop: 10,
+    marginTop: "-0%",
     paddingHorizontal: 0,
   },
   recommendation: {
@@ -456,10 +450,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   category1: {
-    height: 50,
-    width: 50,
+    height: "30%",
+    width: "70%",
     borderRadius: 25,
-    margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#E0E0E0',
@@ -482,38 +475,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFA500',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  itemContainer: {
-    width: Dimensions.get('window').width * 0.9,
-    height: 200,
-    margin: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  itemImage: {
-    width: '100%',
-    height: '70%',
-  },
-  itemDetails: {
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  itemPrice: {
-    fontSize: 14,
-    color: 'green',
   },
 });
 
