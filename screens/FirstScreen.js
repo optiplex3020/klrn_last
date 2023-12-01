@@ -54,7 +54,7 @@ export default FirstScreen = ({navigation}) => {
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <View style={style.btn2}>
-                  <Text style={{color: 'black'}}>S'inscrire</Text>
+                  <Text style={{color: '#009387'}}>S'inscrire</Text>
                 </View>
               </TouchableOpacity>
             </Animatable.View>
@@ -73,7 +73,7 @@ export default FirstScreen = ({navigation}) => {
       btn: {
         height: 60,
         marginHorizontal: 20,
-        backgroundColor: 'black',
+        backgroundColor: '#009387',
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
@@ -84,11 +84,18 @@ export default FirstScreen = ({navigation}) => {
         marginHorizontal: 20,
         backgroundColor: 'white',
         borderRadius: 15,
-        borderColor: 'black',
+        borderColor: '#009387',
         borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
       },
-      title: {fontSize: 32, fontWeight: 'bold'},
-      textStyle: {fontSize: 16, color: "#B2B2B2"},
+      title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#009387'
+      },
+      textStyle: {
+        fontSize: 16,
+        color: "#B2B2B2"
+      },
     });

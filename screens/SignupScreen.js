@@ -14,7 +14,6 @@ export default SignupScreen = ({navigation}) => {
     const [password, setPassword] = useState();
     const [username, setUsername] = useState();
     const [loading, setLoading] = useState(false);
-    const [profilePhoto, setProfilePhoto] = useState();
     const firebase = useContext(FirebaseContext)
     const [_, setUser] = useContext(UserContext)
     const [data, setData] = React.useState({
@@ -26,20 +25,31 @@ export default SignupScreen = ({navigation}) => {
     });
 
     const signUp = async () => {
-        setLoading(true);
-
-        const user = {username, email, password};
-
-        try {
-            const createdUser = await firebase.createUser(user)
-
-            setUser({ ...createdUser, isLoggedIn: true});
-        } catch (error) {
-            console.log("Error @signUp: ", error)
-        } finally {
-            setLoading(false)
-        }
-    };
+      setLoading(true);
+  
+      if (!username || !email || !password) {
+          console.log("Error: username, email and password must not be empty");
+          setLoading(false);
+          return;
+      }
+  
+      const user = {username, email, password};
+  
+      try {
+          const createdUser = await firebase.createUser(user)
+  
+          if (createdUser) {
+              setUser({ ...createdUser, isLoggedIn: true});
+          } else {
+              console.log("Error: User could not be created");
+          }
+      } catch (error) {
+          console.log("Error @signUp: ", error)
+      } finally {
+          setLoading(false)
+      }
+  };
+  
 
     const textInputChange = (val) => {
         if( val.length != 0 ) {
@@ -77,7 +87,7 @@ export default SignupScreen = ({navigation}) => {
                 <Text style={styles.text_header}>Inscrivez-vous pour commencer</Text>
             </View>
             <View style={styles.footer}>
-                <View style={{marginTop: 100}}>
+                <View style={{marginTop: 40}}>
                     <Text style={styles.text_footer}>Nom d'utilisateur</Text>
                     <View style={styles.action}>
                         <FontAwesome5 name="user" color="#05375a" size={20}/>

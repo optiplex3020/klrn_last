@@ -132,13 +132,13 @@ const HomeScreen = ({ navigation }) => {
     <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false}>
       <View style={[styles.container, isDarkMode && styles.containerDark]}>
         <View style={[styles.header, isDarkMode && styles.headerDark]}>
-        <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]} onPress={toggleMenu}>
-          <Ionicons name="menu-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
-        </TouchableOpacity>
-        <Text style={[styles.appName, isDarkMode && styles.appNameDark]}>Kolia</Text>
-        <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]}>
-          <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
-        </TouchableOpacity>
+          <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]} onPress={toggleMenu}>
+            <Ionicons name="menu-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
+          </TouchableOpacity>
+          <Text style={[styles.appName, isDarkMode && styles.appNameDark]}>Kolia</Text>
+          <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]}>
+            <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
+          </TouchableOpacity>
           <Modal
             animationType="slide"
             transparent={true}
@@ -388,12 +388,12 @@ const styles = StyleSheet.create({
     marginTop: -10
   },
   recommendationContainer: {
-    marginTop: "-0%",
+    marginTop: "-20%",
     paddingHorizontal: 0,
   },
   recommendation: {
     fontSize: 20,
-    color: 'black',
+    color: '#009387',
     fontWeight: 'bold',
     marginBottom: 20,
     paddingHorizontal: 20,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   category1: {
-    height: "30%",
+    height: "25%",
     width: "70%",
     borderRadius: 25,
     justifyContent: 'center',
@@ -458,13 +458,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   categorySelected: {
-    backgroundColor: '#FFA500',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#00000080',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#009387',
   },
   modalHeader: {
     flexDirection: 'row',

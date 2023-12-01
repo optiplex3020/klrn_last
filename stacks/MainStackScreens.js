@@ -54,7 +54,7 @@ const BottomTabNavigator = () => {
                                 <FontAwesome5
                                     name="home"
                                     size={20}
-                                    color={focused ? '#000' : 'grey'} />
+                                    color={focused ? '#009387' : 'grey'} />
                             </View>
                         
                         )
@@ -75,7 +75,7 @@ const BottomTabNavigator = () => {
                                 <FontAwesome5
                                     name="search"
                                     size={20}
-                                    color={focused ? '#000' : 'grey'} />
+                                    color={focused ? '#009387' : 'grey'} />
                             </View>
                         
                         )
@@ -97,7 +97,7 @@ const BottomTabNavigator = () => {
                             <FontAwesome5
                                 name="shopping-cart"
                                 size={20}
-                                color={focused ? '#000' : 'grey'} />
+                                color={focused ? '#009387' : 'grey'} />
                         </View>
                     
                     )

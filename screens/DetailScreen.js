@@ -75,7 +75,7 @@ export default DetailScreen = ({ route, navigation }) => {
         <NumericInput
           maxValue={20}
           value={value}
-          marginTop={2000}
+          marginTop={200}
           onChange={setValue}
           minValue={1}
           valueType="integer"
@@ -83,9 +83,9 @@ export default DetailScreen = ({ route, navigation }) => {
           totalHeight={40}
           rounded
           textColor="#000"
-          iconStyle={{ color: 'black' }}
-          rightButtonBackgroundColor="#transparent"
-          leftButtonBackgroundColor="transparent"
+          iconStyle={{ color: 'white' }}
+          rightButtonBackgroundColor={"#000"}
+          leftButtonBackgroundColor={"#000"}
         />
         
         {showMessage && (
@@ -96,7 +96,7 @@ export default DetailScreen = ({ route, navigation }) => {
 
         <View style={styles.footer}>
           <View>
-            <Text style={{ color: '#001dff', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
+            <Text style={{ color: '#009387', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
           </View>
           <TouchableOpacity onPress={() => handleAddToCart(item, value)} style={styles.bookNowBtn}>
             <Text style={{ color: '#fff' }}>Ajouter au panier</Text>
@@ -107,7 +107,7 @@ export default DetailScreen = ({ route, navigation }) => {
   );
 };
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#009387',
     borderRadius: 10,
     paddingHorizontal: 20,
   },
