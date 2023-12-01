@@ -88,7 +88,7 @@ const HomeScreen = ({ navigation }) => {
         ]}
         onPress={() => showCategoryItems(category)}
       >
-        <Text style={styles.categoryText}>{category}</Text>
+        <Text style={[styles.categoryText, category === selectedCategory && styles.categoryTextDark, isDarkMode && styles.categoryTextDark]}>{category}</Text>
       </Pressable>
     );
   };
@@ -148,17 +148,27 @@ const HomeScreen = ({ navigation }) => {
           >
             <TouchableWithoutFeedback onPress={toggleMenu}>
               <View style={styles.modalContainer}>
-                <View style={styles.menu}>
+                <View style={[styles.menu, isDarkMode && styles.menuDark]}>
                   <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-                    <Ionicons name="close-outline" size={24} color="black" />
+                    <Ionicons name="close-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.menuItem}>
-                    <Ionicons name="home-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Accueil</Text>
+                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]} onPress={toggleDarkMode}>
+                    <Ionicons
+                      name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+                      size={24}
+                      color={isDarkMode ? 'white' : 'black'} // Changez la couleur en fonction du mode sombre
+                    />
+                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>
+                      Mode {isDarkMode ? 'clair' : 'sombre'}
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.menuItem}>
-                    <Ionicons name="settings-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Paramètres</Text>
+                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
+                    <Ionicons name="home-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
+                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Accueil</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
+                    <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
+                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Paramètres</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -268,7 +278,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end', 
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'transparent',
   },
   menu: {
     backgroundColor: 'white',
@@ -451,11 +461,18 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E0E0E0'
-
+    backgroundColor: 'transparent',
+    borderWidth: 0.4,
+    borderColor: "#009387"
+  },
+  categoryText: {
+    color: "black"
+  },
+  categoryTextDark: {
+    color: "white"
   },
   categorySelected: {
-    height: windowHeight * 0.08, // 8% de la hauteur de l'écran
+    height: windowHeight * 0.05, // 8% de la hauteur de l'écran
     width: width * 0.7, // 70% de la largeur de l'écran
     backgroundColor: '#009387',
   },

@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
 import NumericInput from 'react-native-numeric-input';
 import { ThemeContext } from '../Context/ThemeContext';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
+
 
 
 export default DetailScreen = ({ route, navigation }) => {
@@ -86,6 +87,8 @@ export default DetailScreen = ({ route, navigation }) => {
           iconStyle={{ color: 'white' }}
           rightButtonBackgroundColor={"#000"}
           leftButtonBackgroundColor={"#000"}
+          leftButtonContent={<MaterialIcons name="remove" size={24} />}
+        rightButtonContent={<MaterialIcons name="add" size={24} />}
         />
         
         {showMessage && (
