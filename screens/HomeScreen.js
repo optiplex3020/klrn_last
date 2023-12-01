@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Dimensions, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableWithoutFeedback, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firebase from 'firebase/compat/app';
 import { ThemeContext } from '../Context/ThemeContext';
@@ -30,6 +30,10 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     getCategories();
   }, []);
+
+  const Separator = () => {
+    return <View style={{ width: width * 0.05 }} />; // Espace de 5% entre les catégories
+  };
 
   const getPosts = async () => {
     setLoading(true);
@@ -75,9 +79,6 @@ const HomeScreen = ({ navigation }) => {
   };
       
       
-
-   
-
   const renderCategoryIcon = (category) => {
     return (
       <Pressable
@@ -145,31 +146,23 @@ const HomeScreen = ({ navigation }) => {
             visible={isMenuVisible}
             onRequestClose={toggleMenu}
           >
-            <View style={styles.modalContainer}>
-              <View style={[styles.menu, isDarkMode && styles.menuDark]}>
-                <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-                  <Ionicons name="close-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]} onPress={toggleDarkMode}>
-                  <Ionicons
-                    name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
-                    size={24}
-                    color={isDarkMode ? 'white' : 'black'} // Changez la couleur en fonction du mode sombre
-                  />
-                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>
-                    Mode {isDarkMode ? 'clair' : 'sombre'}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
-                  <Ionicons name="home-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Accueil</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
-                  <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                  <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Paramètres</Text>
-                </TouchableOpacity>
+            <TouchableWithoutFeedback onPress={toggleMenu}>
+              <View style={styles.modalContainer}>
+                <View style={styles.menu}>
+                  <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+                    <Ionicons name="close-outline" size={24} color="black" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.menuItem}>
+                    <Ionicons name="home-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Accueil</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.menuItem}>
+                    <Ionicons name="settings-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Paramètres</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
+            </TouchableWithoutFeedback>
           </Modal>
         </View>
        <FlatList
@@ -185,6 +178,8 @@ const HomeScreen = ({ navigation }) => {
              {renderCategoryIcon(item)}
            </Pressable>
          )}
+         ItemSeparatorComponent={Separator}
+
        />
         <View style={styles.recommendationContainer}>
           <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
@@ -226,6 +221,7 @@ const HomeScreen = ({ navigation }) => {
 
 const width = Dimensions.get('screen').width / 2;
 const { height } = Dimensions.get('window');
+const windowHeight = Dimensions.get('window').height;
 
 
 const styles = StyleSheet.create({
@@ -388,7 +384,7 @@ const styles = StyleSheet.create({
     marginTop: -10
   },
   recommendationContainer: {
-    marginTop: "-20%",
+    marginTop: "5%",
     paddingHorizontal: 0,
   },
   recommendation: {
@@ -450,14 +446,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   category1: {
-    height: "25%",
-    width: "70%",
+    height: windowHeight * 0.05, // Exemple: 8% de la hauteur de l'écran
+    width: width * 0.7, // Exemple: 70% de la largeur de l'écran
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#E0E0E0'
+
   },
   categorySelected: {
+    height: windowHeight * 0.08, // 8% de la hauteur de l'écran
+    width: width * 0.7, // 70% de la largeur de l'écran
     backgroundColor: '#009387',
   },
   modalHeader: {
