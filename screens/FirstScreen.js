@@ -49,12 +49,12 @@ export default FirstScreen = ({navigation}) => {
             >
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <View style={style.btn}>
-                  <Text style={{color: 'white'}}>Commencer</Text>
+                  <Text style={{color: 'white'}}>Connexion</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <View style={style.btn2}>
-                  <Text style={{color: '#009387'}}>S'inscrire</Text>
+                  <Text style={{color: '#009387'}}>Commencere</Text>
                 </View>
               </TouchableOpacity>
             </Animatable.View>
