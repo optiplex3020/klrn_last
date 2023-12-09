@@ -1,14 +1,10 @@
 import React, {useState, useContext} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, StatusBar,  } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
 import {UserContext} from '../Context/UserContext'
 import {FirebaseContext} from '../Context/FirebaseContext'
-import {LinearGradient} from 'expo-linear-gradient';
 import styled from 'styled-components'
-import { ActivityIndicator } from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/compat/auth';
-import db from '../firebase/db';
-import firebase from "firebase/compat/app";
+import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons';
+
 
 export default  RegisterScreen = ({navigation}) => { 
     
@@ -16,33 +12,40 @@ export default  RegisterScreen = ({navigation}) => {
     const [password, setPassword] = useState();
     const [username, setUsername] = useState();
     const [loading, setLoading] = useState(false);
-    const [_, setUser] = useContext(UserContext)   
+    const [_, setUser] = useContext(UserContext);
+    const firebase = useContext(FirebaseContext);
 
-    const signUp = async () => {
-        setLoading(true);
+    const [data, setData] = React.useState({
+      email: '',
+      password: '',
+      check_textInputChange: false,
+      secureTextEntry: true,
+    });
 
-        try {
-            const auth = getAuth();
-            const { user } = await createUserWithEmailAndPassword(auth, email, password);
-            await db.collection('users').doc(user.uid).set({
-              username,
-              email,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    const updateSecureTextEntry = () => {
+      setData({
+          ...data,
+          secureTextEntry: !data.secureTextEntry
+      });
+  }
 
-            });
-            setUser({
-              uid: user.uid,
-              email: user.email,
-              username,
-              isLoggedIn: true
-            });
-            console.log('compte crée avec succès !');
-          } catch (error) {
-            console.log(error);
-          } finally {
-            setLoading(false)
-        }
-    };   
+  const signUp = async () => {
+    setLoading(true)
+    try {
+      const userInfo = await firebase.createUser(username, email, password);
+
+      setUser({
+        email: userInfo.email,
+        username: userInfo.username,
+        isAuthenticated: true
+      });
+      console.log('compte crée avec succès !');
+      } catch (error) {
+        console.log(error);
+      }finally {
+          setLoading(false)
+      }
+};   
             
     return (
         <View style={styles.container}>
