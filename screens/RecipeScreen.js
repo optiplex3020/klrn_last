@@ -290,7 +290,9 @@ const styles = StyleSheet.create({
     color: "black"
   },
   emptyCartMessage: {
+    justifyContent: 'center',
     alignContent: "center",
+    alignItems: 'center',
   },
   emptyCartMessageDark: {
     color: "white"

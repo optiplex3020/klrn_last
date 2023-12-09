@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, FlatList, Text, View, StyleSheet } from 'react-native';
+import { TextInput, TouchableOpacity, FlatList, Dimensions, View, StyleSheet } from 'react-native';
 import "firebase/compat/firestore";
 require('firebase/compat/firestore')
 import firebase from "firebase/compat/app";
@@ -17,8 +17,7 @@ export default function SearchComponent({ onSearchResults }) {
       .get()
       .then((querySnapshot) => {
         const results = querySnapshot.docs.map((doc) => doc.data());
-        setSearchResults(results);
-        onSearchResults(results); // Pass the search results to the HomeScreen
+        onSearchResults(results);
       });
   };
 
@@ -33,25 +32,24 @@ export default function SearchComponent({ onSearchResults }) {
           onChangeText={(query) => setSearchQuery(query)}
         />
         <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <AntDesign name="search1" size={24} color="white" />
+          <AntDesign name="search1" size={24} color="black" />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
+const windowHeight = Dimensions.get('window').height;
 
 
 const styles=StyleSheet.create({
     container: {
         flex: 1,
-        width: "95%",
         flexDirection: 'row', 
         alignItems: 'center',
         justifyContent: 'center'
     },
       searchContainer: {
-        backgroundColor: 'black',
         borderRadius: 25,
         padding: 5,
         paddingHorizontal: 15,
@@ -69,12 +67,13 @@ const styles=StyleSheet.create({
         width: "80%",
         height: 200,
         marginLeft: 20,
-        color: "#666666"
+        color: "#fff"
       },
       search: {
+        marginTop: windowHeight*0.02,
         height: 45,
         width: "95%",
-        backgroundColor: "#494949",
+        backgroundColor: "#f7f7f7",
         borderRadius: 10,
         flexDirection: 'row', 
         alignItems: 'center',

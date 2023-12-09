@@ -1,15 +1,13 @@
 import React, { useState, useContext, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, Modal, Image, SafeAreaView } from 'react-native';
 import { ThemeContext } from '../Context/ThemeContext';
-import * as Animatable from 'react-native-animatable';  // Utilisez * as Animatable pour importer toutes les composantes Animatable
-import { Image } from 'react-native';  // Assurez-vous que l'importation de Image est correcte
+import * as Animatable from 'react-native-animatable';  
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 
 export default SearchScreen = ({ navigation }) => {
-  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const { isDarkMode } = useContext(ThemeContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -38,6 +36,7 @@ export default SearchScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item }) => (
+    <SafeAreaView>
     <TouchableOpacity
       style={[styles.itemContainer, isDarkMode && styles.itemContainerDark]}
       onPress={handlePress}>
@@ -54,10 +53,12 @@ export default SearchScreen = ({ navigation }) => {
         </Text>
       </View>
     </TouchableOpacity>
+
+    </SafeAreaView>
   );
 
   return (
-    <View style={[styles.container, isDarkMode && styles.containerDark]}>
+    <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
       <View style={styles.searchContainer}>
         <TextInput
           style={[styles.searchInput, isDarkMode && styles.searchInputDark]}
@@ -82,7 +83,7 @@ export default SearchScreen = ({ navigation }) => {
           />
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 

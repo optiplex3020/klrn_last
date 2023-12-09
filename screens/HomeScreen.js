@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableWithoutFeedback, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableWithoutFeedback, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import firebase from 'firebase/compat/app';
+import * as Animatable from 'react-native-animatable';  
+import { AntDesign } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import SearchComponent from '../components/SearchComponent';
 require('firebase/compat/firestore');
 
 const HomeScreen = ({ navigation }) => {  
@@ -16,10 +19,20 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(null);
   const refPosts = firebase.firestore().collection('post');
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const [categoryPosts, setCategoryPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [categoryAnimation, setCategoryAnimation] = useState(new Animated.Value(0));
+  const [searchResults, setSearchResults] = useState([]); // Stocker les résultats de recherche
+  const [isModalVisible, setIsModalVisible] = useState(false); // État pour contrôler la modal
+
+  // Fonction pour recevoir les résultats de recherche depuis SearchComponent
+  const receiveSearchResults = (results) => {
+    setSearchResults(results);
+    setIsModalVisible(true); // Afficher la modal lorsque des résultats sont disponibles
+  };
+
+  const imageRef = useRef(null);
+
+
   const toggleMenu = () => {
     setMenuVisible(!isMenuVisible);
   };
@@ -51,8 +64,6 @@ const HomeScreen = ({ navigation }) => {
     setLoading(false);
   };
 
-
-    
   const getCategories = async () => {
     const snapshot = await refPosts.orderBy('categorie').get();
     if (!snapshot.empty) {
@@ -61,6 +72,11 @@ const HomeScreen = ({ navigation }) => {
     } else {
       setCategories([]);
     }
+  };
+
+  const handlePress = () => {
+    imageRef.current.animate('pulse', 500);
+    navigation.navigate('Detail', { item: item });
   };
 
 
@@ -128,6 +144,29 @@ const HomeScreen = ({ navigation }) => {
       </Pressable>
     </View>  
   );
+  const renderItem3 = ({ item }) => (
+    <SafeAreaView>
+      <TouchableOpacity
+        style={[styles.itemContainer, isDarkMode && styles.itemContainerDark]}
+        onPress={() => {
+          navigation.navigate('Detail', {
+            item: item,
+          })}}>
+        <Animatable.Image
+          source={{ uri: item.image }}
+          style={styles.itemImage}
+          animation="fadeIn"
+          ref={imageRef}
+        />
+        <View style={styles.itemInfoContainer}>
+          <Text style={[styles.itemTitle, isDarkMode && styles.itemTitleDark]}>{item.title}</Text>
+          <Text style={[styles.itemDescription, isDarkMode && styles.itemDescriptionDark]}>
+            {item.text}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
 
   return (
     <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false}>
@@ -191,6 +230,29 @@ const HomeScreen = ({ navigation }) => {
          ItemSeparatorComponent={Separator}
 
        />
+       <View>
+         <SearchComponent onSearchResults={receiveSearchResults} />
+         <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <FlatList
+                data={searchResults}
+                renderItem={renderItem3}
+                keyExtractor={(item) => item.id.toString()}
+              />
+              {/* Bouton pour fermer la modal */}
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                <Text>Fermer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+       </View>
         <View style={styles.recommendationContainer}>
           <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
             Voyagez dès maintenant
