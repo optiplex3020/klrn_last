@@ -67,17 +67,24 @@ const styles=StyleSheet.create({
         width: "80%",
         height: 200,
         marginLeft: 20,
-        color: "#fff"
+        color: "#000"
       },
       search: {
-        marginTop: windowHeight*0.02,
+        marginBottom: windowHeight*0.04,
+        marginTop: windowHeight*0.01,
         height: 45,
         width: "95%",
         backgroundColor: "#f7f7f7",
         borderRadius: 10,
+        borderColor: 'back',
+        borderWidth: 0.5,
         flexDirection: 'row', 
         alignItems: 'center',
         shadowOpacity: 0.2,
+        shadowOffset: {
+          height: 8,
+          width: 2
+        },
         shadowColor: '#000',
         justifyContent: 'center'
       },

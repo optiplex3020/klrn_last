@@ -21,13 +21,12 @@ const HomeScreen = ({ navigation }) => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]); // Stocker les résultats de recherche
-  const [isModalVisible, setIsModalVisible] = useState(false); // État pour contrôler la modal
+  const [searchResults, setSearchResults] = useState([]); 
+  const [isModalVisible, setIsModalVisible] = useState(false); 
 
-  // Fonction pour recevoir les résultats de recherche depuis SearchComponent
   const receiveSearchResults = (results) => {
     setSearchResults(results);
-    setIsModalVisible(true); // Afficher la modal lorsque des résultats sont disponibles
+    setIsModalVisible(true); 
   };
 
   const imageRef = useRef(null);
@@ -43,6 +42,13 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     getCategories();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      setIsModalVisible(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const Separator = () => {
     return <View style={{ width: width * 0.05 }} />; // Espace de 5% entre les catégories
@@ -73,12 +79,6 @@ const HomeScreen = ({ navigation }) => {
       setCategories([]);
     }
   };
-
-  const handlePress = () => {
-    imageRef.current.animate('pulse', 500);
-    navigation.navigate('Detail', { item: item });
-  };
-
 
   const showCategoryItems = (category) => {
     if (selectedCategory === category) {
@@ -145,27 +145,29 @@ const HomeScreen = ({ navigation }) => {
     </View>  
   );
   const renderItem3 = ({ item }) => (
-    <SafeAreaView>
       <TouchableOpacity
         style={[styles.itemContainer, isDarkMode && styles.itemContainerDark]}
         onPress={() => {
           navigation.navigate('Detail', {
             item: item,
-          })}}>
-        <Animatable.Image
-          source={{ uri: item.image }}
-          style={styles.itemImage}
-          animation="fadeIn"
-          ref={imageRef}
-        />
-        <View style={styles.itemInfoContainer}>
-          <Text style={[styles.itemTitle, isDarkMode && styles.itemTitleDark]}>{item.title}</Text>
-          <Text style={[styles.itemDescription, isDarkMode && styles.itemDescriptionDark]}>
-            {item.text}
-          </Text>
+          });
+        }}
+      >
+        <View style={styles.itemContent}>
+          <Animatable.Image
+            source={{ uri: item.image }}
+            style={styles.itemImage}
+            animation="fadeIn"
+            ref={imageRef}
+          />
+          <View style={styles.itemInfoContainer}>
+            <Text style={[styles.itemTitle, isDarkMode && styles.itemTitleDark]}>{item.title}</Text>
+            <Text style={[styles.itemDescription, isDarkMode && styles.itemDescriptionDark]}>
+              {item.text}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
-    </SafeAreaView>
   );
 
   return (
@@ -185,7 +187,7 @@ const HomeScreen = ({ navigation }) => {
             visible={isMenuVisible}
             onRequestClose={toggleMenu}
           >
-            <TouchableWithoutFeedback onPress={toggleMenu}>
+            <TouchableOpacity onPress={toggleMenu}>
               <View style={styles.modalContainer}>
                 <View style={[styles.menu, isDarkMode && styles.menuDark]}>
                   <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
@@ -211,9 +213,34 @@ const HomeScreen = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           </Modal>
         </View>
+       <View>
+         <SearchComponent onSearchResults={receiveSearchResults} />
+         <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <TouchableOpacity style={styles.modalContainer} activeOpacity={1}
+          onPressOut={() => setIsModalVisible(false)} // Fermeture du modal en cliquant à l'extérieur
+        >
+            <View style={styles.modalContent}>
+              <FlatList
+                data={searchResults}
+                renderItem={renderItem3}
+                keyExtractor={(item) => item.id.toString()}
+              />
+              {/* Bouton pour fermer la modal */}
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                <Text>Fermer</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+       </View>
        <FlatList
          data={categories}
          horizontal
@@ -230,29 +257,6 @@ const HomeScreen = ({ navigation }) => {
          ItemSeparatorComponent={Separator}
 
        />
-       <View>
-         <SearchComponent onSearchResults={receiveSearchResults} />
-         <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={() => setIsModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <FlatList
-                data={searchResults}
-                renderItem={renderItem3}
-                keyExtractor={(item) => item.id.toString()}
-              />
-              {/* Bouton pour fermer la modal */}
-              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                <Text>Fermer</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-       </View>
         <View style={styles.recommendationContainer}>
           <Text style={[styles.recommendation, isDarkMode && styles.recommendationDark]}>
             Voyagez dès maintenant
@@ -336,12 +340,66 @@ const styles = StyleSheet.create({
   appNameDark: {
     color: '#fff', 
   },
-  
+
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end', 
-    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '95%',
+    maxHeight: '100%',
+  },
+
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  itemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  itemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  itemInfoContainer: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  itemDescription: {
+    fontSize: 14,
+    color: '#666',
+  },
+
+
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#009387',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  
   menu: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -371,11 +429,6 @@ const styles = StyleSheet.create({
   },
   menuTextDark: {
     color: '#fff'
-  },
-  closeButton: {
-    marginTop: '10%',
-    alignSelf: 'flex-end',
-    padding: 10,
   },
   closeButtonDark: {
     color: 'fff'
