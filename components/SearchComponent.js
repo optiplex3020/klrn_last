@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, FlatList, Dimensions, View, StyleSheet } from 'react-native';
+import { TextInput, TouchableOpacity, Dimensions, View, StyleSheet } from 'react-native';
 import "firebase/compat/firestore";
 require('firebase/compat/firestore')
 import firebase from "firebase/compat/app";
@@ -7,7 +7,6 @@ import { AntDesign } from '@expo/vector-icons';
 
 export default function SearchComponent({ onSearchResults }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
 
   const handleSearch = () => {
     firebase
@@ -71,7 +70,6 @@ const styles=StyleSheet.create({
       },
       search: {
         marginBottom: windowHeight*0.04,
-        marginTop: windowHeight*0.01,
         height: 45,
         width: "95%",
         backgroundColor: "#f7f7f7",

@@ -172,71 +172,27 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false}>
-      <View style={[styles.container, isDarkMode && styles.containerDark]}>
+      <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
         <View style={[styles.header, isDarkMode && styles.headerDark]}>
-          <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]} onPress={toggleMenu}>
-            <Ionicons name="menu-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
-          </TouchableOpacity>
           <Text style={[styles.appName, isDarkMode && styles.appNameDark]}>Kolia</Text>
-          <TouchableOpacity style={[styles.iconContainer, isDarkMode && styles.iconContainerDark]}>
-            <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'}  />
-          </TouchableOpacity>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={isMenuVisible}
-            onRequestClose={toggleMenu}
-          >
-            <TouchableOpacity onPress={toggleMenu}>
-              <View style={styles.modalContainer}>
-                <View style={[styles.menu, isDarkMode && styles.menuDark]}>
-                  <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-                    <Ionicons name="close-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]} onPress={toggleDarkMode}>
-                    <Ionicons
-                      name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
-                      size={24}
-                      color={isDarkMode ? 'white' : 'black'} // Changez la couleur en fonction du mode sombre
-                    />
-                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>
-                      Mode {isDarkMode ? 'clair' : 'sombre'}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
-                    <Ionicons name="home-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Accueil</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]}>
-                    <Ionicons name="settings-outline" size={24} color={isDarkMode ? 'white' : 'black'} />
-                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>Paramètres</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </Modal>
         </View>
        <View>
-         <SearchComponent onSearchResults={receiveSearchResults} />
-         <Modal
+        <SearchComponent onSearchResults={receiveSearchResults} />
+        <Modal
           animationType="slide"
           transparent={true}
           visible={isModalVisible}
           onRequestClose={() => setIsModalVisible(false)}
         >
           <TouchableOpacity style={styles.modalContainer} activeOpacity={1}
-          onPressOut={() => setIsModalVisible(false)} // Fermeture du modal en cliquant à l'extérieur
-        >
+            onPressOut={() => setIsModalVisible(false)} // Fermeture du modal en cliquant à l'extérieur
+          >
             <View style={styles.modalContent}>
               <FlatList
                 data={searchResults}
                 renderItem={renderItem3}
                 keyExtractor={(item) => item.id.toString()}
               />
-              {/* Bouton pour fermer la modal */}
-              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                <Text>Fermer</Text>
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </Modal>
@@ -290,7 +246,7 @@ const HomeScreen = ({ navigation }) => {
           extraData={selectedId}
           renderItem={renderItem}
         />
-      </View>
+      </SafeAreaView>
     </ScrollView>
   );
 };
@@ -316,8 +272,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    flexDirection: 'row',
-    marginTop: "8%",
+    flexDirection: 'center',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -327,12 +282,6 @@ const styles = StyleSheet.create({
   headerDark: {
     backgroundColor: '#000'
   },
-  iconContainer: {
-    padding: 8,
-  },
-  iconContainerDark: {
-    backgroundColor: '#000', 
-  },
   appName: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -340,7 +289,11 @@ const styles = StyleSheet.create({
   appNameDark: {
     color: '#fff', 
   },
-
+  modalContainer1: {
+    flex: 1,
+    justifyContent: 'flex-end', 
+    backgroundColor: 'transparent',
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -386,8 +339,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-
-
   closeButton: {
     marginTop: 10,
     padding: 10,
@@ -399,7 +350,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  
   menu: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -590,6 +540,11 @@ const styles = StyleSheet.create({
     height: windowHeight * 0.05, // 8% de la hauteur de l'écran
     width: width * 0.7, // 70% de la largeur de l'écran
     backgroundColor: '#009387',
+  },
+  closeButton1: {
+    marginTop: '10%',
+    alignSelf: 'flex-end',
+    padding: 10,
   },
   modalHeader: {
     flexDirection: 'row',
