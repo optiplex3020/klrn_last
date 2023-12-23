@@ -1,10 +1,10 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
-import { StripeProvider, usePaymentSheet } from '@stripe/stripe-react-native';
+import { StripeProvider, usePaymentSheet, AddressSheet } from '@stripe/stripe-react-native';
 import firebase from "firebase/compat/app";
 import 'firebase/compat/functions';
 
@@ -25,6 +25,7 @@ const RecipeScreen = () => {
       const { paymentIntent, ephemeralKey } = await fetchPaymentSheetParams();
 
       const { error } = await initPaymentSheet({
+        appearance: customAppearance,
         customerEphemeralKeySecret: ephemeralKey,
         paymentIntentClientSecret: paymentIntent,
         merchantDisplayName: 'KoLia Fr',
@@ -40,6 +41,33 @@ const RecipeScreen = () => {
       console.error('Erreur d\'initialisation de la feuille de paiement :', error);
     }
   };
+
+  const customAppearance = {
+    font: {
+      family:
+        Platform.OS === 'android' ? 'avenirnextregular' : 'AvenirNext-Regular',
+    },
+    shapes: {
+      borderRadius: 12,
+      borderWidth: 0.5,
+    },
+    primaryButton: {
+      shapes: {
+       borderRadius: 20,
+      },
+    },
+    colors: {
+      primary: '#fcfdff',
+      background: '#ffffff',
+      componentBackground: '#f3f8fa',
+      componentBorder: '#f3f8fa',
+      componentDivider: '#000000',
+      primaryText: '#000000',
+      secondaryText: '#000000',
+      componentText: '#000000',
+      placeholderText: '#73757b',
+    },
+   };
 
   const buy = async () => {
     try {
@@ -141,10 +169,8 @@ const RecipeScreen = () => {
 
   return (
 
-    <StripeProvider
-      publishableKey={STRIPE_PUBLISHABLE_KEY}
-      urlScheme='fr.airlibre.kolia'>
-        <View style={[styles.main, isDarkMode && styles.mainDark]}>
+    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme='fr.airlibre.kolia'>
+      <View style={[styles.main, isDarkMode && styles.mainDark]}>
           <View style={[styles.header, isDarkMode && styles.headerDark]}>
             <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
           </View>
@@ -162,18 +188,26 @@ const RecipeScreen = () => {
           )}
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
           <TouchableOpacity
-            style={[styles.paymentButton, isDarkMode && styles.paymentButtonDark, {
-              shadowColor: isDarkMode ? "white" : "black",
-              shadowOffset: { width: 1, height: 3 },
-              shadowOpacity: 0.5,
-              shadowRadius: 2,
-              elevation: 3, // Pour Android
-            }]}
+            style={[
+              styles.paymentButton,
+              isDarkMode && styles.paymentButtonDark,
+              {
+                shadowColor: isDarkMode ? 'white' : 'black',
+                shadowOffset: { width: 1, height: 3 },
+                shadowOpacity: 0.5,
+                shadowRadius: 2,
+                elevation: 3, // Pour Android
+                // Ajouter un style distinctif lorsque le bouton est désactivé
+                opacity: !ready ? 0.5 : 1, // Réduit l'opacité du bouton quand il n'est pas prêt
+                backgroundColor: !ready ? '#ccc' : '#000', // Change la couleur du bouton quand il n'est pas prêt
+              },
+            ]}
             onPress={buy}
             disabled={!ready} // Désactive le bouton si la feuille de paiement n'est pas prête
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>
+
       </View>
     </StripeProvider>
     
@@ -219,13 +253,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    width: '100%', // Modifier cette ligne
+    width: '100%', 
     marginLeft: '4%'
   },
   darkModeContainer: {
-    // Styles for the dark mode container
     backgroundColor: 'black',
-    // Add other dark mode styles here
   },
 
   productContainerDark: {
