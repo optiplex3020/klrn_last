@@ -11,6 +11,9 @@ export default LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [emptyFieldsError, setEmptyFieldsError] = useState('');
     const [_, setUser] = useContext(UserContext);
     const firebase = useContext(FirebaseContext);
 
@@ -28,24 +31,36 @@ export default LoginScreen = ({navigation}) => {
     }
 
     const signIn = async () => {
-        setLoading(true)
-        try {
-            await firebase.signIn(email, password)
-
-            const uid = firebase.getCurrentUser().uid;
-
-            const userInfo = await firebase.getUserInfo(uid);
-
-            setUser({
-                email: userInfo.email,
-                isAuthenticated: true,
-            });
-        } catch (error) {
-            alert(error.message)
-        } finally {
-            setLoading(false)
+        setLoading(true);
+    
+        // Réinitialiser les messages d'erreur
+        setEmailError('');
+        setPasswordError('');
+        setEmptyFieldsError('');
+    
+        if (!email || !password) {
+            setEmptyFieldsError('Veuillez remplir tous les champs');
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+            setEmailError('Adresse e-mail invalide');
+        } else {
+            try {
+                await firebase.signIn(email, password);
+    
+                const uid = firebase.getCurrentUser().uid;
+                const userInfo = await firebase.getUserInfo(uid);
+    
+                setUser({
+                    email: userInfo.email,
+                    isAuthenticated: true,
+                });
+            } catch (error) {
+                setPasswordError('Mot de passe incorrect');
+            }
         }
+    
+        setLoading(false);
     };
+    
         
     return (
         <View style={styles.container}>
@@ -65,25 +80,50 @@ export default LoginScreen = ({navigation}) => {
                     <Text style={styles.text_footer}>Email</Text>
                     <View style={styles.action}>
                         <FontAwesome5 name="envelope" color="#05375a" size={20}/>
-                        <TextInput style={styles.textInput} placeholder="Email" autoCapitalize="none" onChangeText={email => setEmail(email.trim())} value={email} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Email"
+                            autoCapitalize="none"
+                            onChangeText={(email) => {
+                                setEmail(email.trim());
+                                setEmailError(''); // Réinitialiser le message d'erreur
+                            }}
+                            onFocus={() => setEmailError('')} // Réinitialiser le message d'erreur au focus
+                            value={email}
+                        />
                         {data.check_textInputChange ?
                         <Animatable.View animation="bounceIn">
-                                                <Feather name="check-circle" color="green" size={20} />
+                            <Feather name="check-circle" color="green" size={20} />
                         </Animatable.View> 
                         : null}
                     </View> 
                     <Text style={[styles.text_footer, {marginTop: 35}]}>Mot de passe</Text>
                     <View style={styles.action}>
                         <FontAwesome5 name="lock" color="#05375a" size={20}/>
-                        <TextInput style={styles.textInput} placeholder="Mot de passe" autoCapitalize="none" secureTextEntry={data.secureTextEntry ? true : false} onChangeText={password => setPassword(password.trim())} value={password} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Mot de passe"
+                            autoCapitalize="none"
+                            secureTextEntry={data.secureTextEntry ? true : false}
+                            onChangeText={(password) => {
+                                setPassword(password.trim());
+                                setPasswordError(''); // Réinitialiser le message d'erreur
+                            }}
+                            onFocus={() => setPasswordError('')} // Réinitialiser le message d'erreur au focus
+                            value={password}
+                        />
                         <TouchableOpacity onPress={updateSecureTextEntry}>
                             {data.secureTextEntry ? 
-                            <Feather name="eye-off" color="grey" size={20} />
+                            <Feather name="eye-off" color="#009387" size={20} />
                                 :
-                            <Feather name="eye" color="grey" size={20} />
+                            <Feather name="eye" color="#009387" size={20} />
                             }
                             
                         </TouchableOpacity>
+                            {/* ... Vos autres éléments ici ... */}
+                            <Text style={{ color: emailError ? 'red' : 'transparent' }}>{emailError}</Text>
+                            <Text style={{ color: passwordError ? 'red' : 'transparent' }}>{passwordError}</Text>
+                            <Text style={{ color: emptyFieldsError ? 'red' : 'transparent' }}>{emptyFieldsError}</Text>
                     </View>
                     <TouchableOpacity onPress={signIn} style={styles.button_o} disabled={loading}>
                         {loading ? (
@@ -186,7 +226,7 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
         },
         button_o: {
             marginHorizontal: 5,
-            backgroundColor: "#000",
+            backgroundColor: "#009387",
             marginTop: "30%",
             borderRadius: 10,
             alignItems: "center",

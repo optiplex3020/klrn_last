@@ -29,6 +29,11 @@ const HomeScreen = ({ navigation }) => {
     setIsModalVisible(true); 
   };
 
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+  
+
   const imageRef = useRef(null);
 
 
@@ -86,8 +91,11 @@ const HomeScreen = ({ navigation }) => {
     } else {
       setSelectedCategory(category);
       setFilteredPosts(post.filter((p) => p.categorie === category));
+      // Appliquer une animation
+      imageRef.current.fadeIn(); // Assurez-vous que imageRef est correctement référencé
     }
   };
+  
   
   const hideCategoryItems = () => {
     setSelectedCategory(null);
@@ -118,7 +126,8 @@ const HomeScreen = ({ navigation }) => {
             item: item,
           });
         }}>
-        <Image source={{ uri: item.image }} style={{ width: 150, height: 150, borderRadius: 15 }} />
+        <Animatable.Image source={{ uri: item.image }} style={{ width: 150, height: 150, borderRadius: 15 }} animation="fadeIn"  ref={imageRef} />
+        
         <Text style={[styles.title, isDarkMode && styles.titleDark]}>{item.title}</Text>
         <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.categorie}</Text>
         <Text style={[styles.text, isDarkMode && styles.textDark]}>{item.type}</Text>
@@ -126,7 +135,6 @@ const HomeScreen = ({ navigation }) => {
       </Pressable>
     </View>  
   );
-
   const renderItem2 = ({ item }) => (
     <View style={[styles.card]}>
       <Pressable onPress={() => { navigation.navigate('Detail', {
@@ -151,6 +159,7 @@ const HomeScreen = ({ navigation }) => {
           navigation.navigate('Detail', {
             item: item,
           });
+          closeModal();
         }}
       >
         <View style={styles.itemContent}>
@@ -184,15 +193,21 @@ const HomeScreen = ({ navigation }) => {
           visible={isModalVisible}
           onRequestClose={() => setIsModalVisible(false)}
         >
-          <TouchableOpacity style={styles.modalContainer} activeOpacity={1}
-            onPressOut={() => setIsModalVisible(false)} // Fermeture du modal en cliquant à l'extérieur
+          <TouchableOpacity
+            style={styles.modalContainer}
+            activeOpacity={1}
+            onPressOut={() => setIsModalVisible(false)}
           >
             <View style={styles.modalContent}>
-              <FlatList
-                data={searchResults}
-                renderItem={renderItem3}
-                keyExtractor={(item) => item.id.toString()}
-              />
+              {searchResults.length === 0 ? (
+                <Text>Aucun produit correspondant à votre recherche.</Text>
+              ) : (
+                <FlatList
+                  data={searchResults}
+                  renderItem={renderItem3}
+                  keyExtractor={(item) => item.id.toString()}
+                />
+              )}
             </View>
           </TouchableOpacity>
         </Modal>
@@ -299,6 +314,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    width: '100%'
   },
   modalContent: {
     backgroundColor: '#fff',

@@ -11,6 +11,7 @@ import 'firebase/compat/functions';
 
 const RecipeScreen = () => {
   const [ready, setReady] = useState(false);
+  const [addressSheetVisible, setAddressSheetVisible] = useState(false);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
@@ -186,6 +187,58 @@ const RecipeScreen = () => {
               contentContainerStyle={styles.flatListContainer}
             />
           )}
+          <AddressSheet
+            visible={addressSheetVisible}
+            onSubmit={async (addressDetails) => {
+              setAddressSheetVisible(false);
+              try {
+                const { paymentIntent, ephemeralKey } = await fetchPaymentSheetParams();
+                const { error } = await initPaymentSheet({
+                  defaultShippingDetails: addressDetails,
+                  appearance: customAppearance,
+                  customerEphemeralKeySecret: ephemeralKey,
+                  paymentIntentClientSecret: paymentIntent,
+                  merchantDisplayName: 'KoLia Fr',
+                  allowsDelayedPaymentMethods: true,
+                });
+                if (error) {
+                  console.error('Erreur lors de la configuration de la feuille de paiement :', error);
+                } else {
+                  setReady(true);
+                }
+              } catch (error) {
+                console.error('Erreur lors de la configuration de la feuille de paiement :', error);
+              }
+            }}
+            onError={(error) => {
+              if (error.code === AddressSheetError.Failed) {
+                Alert.alert('Une erreur s\'est produite.', 'Veuillez vérifier les journaux pour plus de détails.');
+                console.log(error?.localizedMessage);
+              }
+              setAddressSheetVisible(false);
+            }}
+            appearance={{
+              colors: {
+                primary: '#F8F8F2',
+                background: '#272822'
+              }
+            }}
+            defaultValues={{
+              phone: '7 62 49 52 96',
+              address: {
+                country: 'France',
+                city: 'Bondy',
+              },
+            }}
+            additionalFields={{
+              phoneNumber: 'required',
+            }}
+            allowedCountries={['FR', 'GB']}
+            primaryButtonTitle={'Utiliser cette adresse'}
+            sheetTitle={'Adresse de livraison'}
+          />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+          
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
           <TouchableOpacity
             style={[
@@ -207,7 +260,6 @@ const RecipeScreen = () => {
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>
-
       </View>
     </StripeProvider>
     

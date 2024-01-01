@@ -12,13 +12,41 @@ export default function SearchComponent({ onSearchResults }) {
     firebase
       .firestore()
       .collection('post')
-      .where('title', '>=', searchQuery)
+      .where('title', '>=', searchQuery) // Recherche pour les textes qui commencent par searchQuery dans 'title'
+      .where('title', '<=', searchQuery + '\uf8ff') // Recherche pour les textes qui se terminent par searchQuery dans 'title'
       .get()
-      .then((querySnapshot) => {
-        const results = querySnapshot.docs.map((doc) => doc.data());
-        onSearchResults(results);
+      .then((titleSnapshot) => {
+        const titleResults = titleSnapshot.docs.map((doc) => doc.data());
+        
+        firebase
+          .firestore()
+          .collection('post')
+          .get()
+          .then((snapshot) => {
+            const textResults = snapshot.docs
+              .map((doc) => doc.data())
+              .filter((item) => {
+                // Vérifiez si le champ 'text' contient le mot recherché
+                return item.text.toLowerCase().includes(searchQuery.toLowerCase());
+              });
+  
+            // Fusionner les résultats des deux recherches
+            const mergedResults = [...titleResults, ...textResults];
+            
+            // Supprimer les doublons potentiellement obtenus dans les deux recherches
+            const uniqueResults = mergedResults.filter((item, index) => {
+              return (
+                mergedResults.findIndex((el) => el.id === item.id) === index
+              );
+            });
+            
+            onSearchResults(uniqueResults);
+          });
       });
   };
+  
+  
+  
 
   return (
     <View style={styles.container}>

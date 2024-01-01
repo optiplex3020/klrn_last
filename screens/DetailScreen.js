@@ -73,23 +73,17 @@ export default DetailScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
         <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
 
-        <NumericInput
-          maxValue={20}
+        <NumericInput 
           value={value}
-          marginTop={200}
-          onChange={setValue}
           minValue={1}
-          valueType="integer"
-          totalWidth={100}
           totalHeight={40}
+          totalWidth={100}
+          step={1}
+          maxValue={10}
           rounded
-          textColor="#000"
-          iconStyle={{ color: 'white' }}
+          iconStyle={{color: "#fff"}}
           rightButtonBackgroundColor={"#000"}
-          leftButtonBackgroundColor={"#000"}
-          leftButtonContent={<MaterialIcons name="remove" size={24} />}
-        rightButtonContent={<MaterialIcons name="add" size={24} />}
-        />
+          leftButtonBackgroundColor={"#000"} />
         
         {showMessage && (
           <View style={styles.alertContainer}>
