@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions, Button, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Platform, Dimensions, Button, TextInput, TouchableOpacity, Alert } from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient';
 import { Feather, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
@@ -8,7 +8,6 @@ import {FirebaseContext} from '../Context/FirebaseContext'
 //import firebase from "firebase/compat/app";
 
 export default SignupScreen = ({navigation}) => { 
-
 
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
@@ -29,6 +28,7 @@ export default SignupScreen = ({navigation}) => {
   
       if (!username || !email || !password) {
           console.log("Error: username, email and password must not be empty");
+          Alert.alert("DFGH")
           setLoading(false);
           return;
       }
@@ -39,7 +39,7 @@ export default SignupScreen = ({navigation}) => {
           const createdUser = await firebase.createUser(user)
   
           if (createdUser) {
-              setUser({ ...createdUser, isLoggedIn: true});
+            setUser({ ...createdUser, isLoggedIn: true, isAuthenticated: true });
           } else {
               console.log("Error: User could not be created");
           }

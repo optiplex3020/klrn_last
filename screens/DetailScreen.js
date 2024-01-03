@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Animated } from 'react-native';
+import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, Modal, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
 import NumericInput from 'react-native-numeric-input';
@@ -14,26 +14,40 @@ export default DetailScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(false);
 
 
   const handleAddToCart = (item, quantity) => {
     dispatch(addToCart({ ...item, quantity }));
     setShowMessage(true);
+    setModalVisible(true); // Ajout pour afficher le modal
+
 
     setTimeout(() => {
       setShowMessage(false);
     }, 3000);
   };
-  
-  const toastConfig = {
-    // ...
-    cart: ({ name, price, ...props }) => (
-      <View style={{ height: 60, width: '100%', backgroundColor: 'white' }}>
-        <Text>Produit ajouté au panier!</Text>
-        <Text>{name}</Text>
-        <Text>{price}€</Text>
-      </View>
-    ),
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const goToHome = () => {
+    setModalVisible(false);
+    navigation.navigate('Home');
+  };
+
+  const viewCart = () => {
+    setModalVisible(false);
+    navigation.navigate('Recipe');
   };
   
   
@@ -75,6 +89,7 @@ export default DetailScreen = ({ route, navigation }) => {
 
         <NumericInput 
           value={value}
+          onChange={setValue}
           minValue={1}
           totalHeight={40}
           totalWidth={100}
@@ -91,6 +106,24 @@ export default DetailScreen = ({ route, navigation }) => {
           </View>
         )}
 
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Produit ajouté au panier!</Text>
+              <TouchableOpacity style={styles.modalButton} onPress={goToHome}>
+                <Text style={styles.modalButtonText}>Continuer mes achats</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={viewCart}>
+                <Text style={styles.modalButtonText}>Voir mon panier</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
         <View style={styles.footer}>
           <View>
             <Text style={{ color: '#009387', fontWeight: 'bold', fontSize: 18 }}>{item.prix}€</Text>
@@ -209,6 +242,43 @@ const styles = StyleSheet.create({
   alertText: {
     color: '#fff', // Couleur du texte de l'alerte (blanc ici)
     fontSize: 16,
+  },
+  // Modal styles
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#009387',
+    padding: 10,
+    margin: 10,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   
 });

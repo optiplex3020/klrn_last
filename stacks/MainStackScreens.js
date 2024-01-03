@@ -3,7 +3,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import { View } from 'react-native';
 import DetailScreen from '../screens/DetailScreen'
 import HomeScreen from '../screens/HomeScreen'
-import SearchScreen from '../screens/SearchScreen'
 import RecipeScreen from '../screens/RecipeScreen'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { createStackNavigator } from '@react-navigation/stack';
@@ -53,27 +52,6 @@ const BottomTabNavigator = () => {
                             }}>
                                 <FontAwesome5
                                     name="home"
-                                    size={20}
-                                    color={focused ? '#009387' : 'grey'} />
-                            </View>
-                        
-                        )
-                }}
-            />
-
-            <Tab.Screen 
-                name="Search"
-                component={SearchScreen}
-                options={{
-                        headerShown: false,
-                        tabBarLabel:"",
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{
-                                position: 'absolute',
-                                top: '50%'
-                            }}>
-                                <FontAwesome5
-                                    name="search"
                                     size={20}
                                     color={focused ? '#009387' : 'grey'} />
                             </View>

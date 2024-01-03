@@ -1,10 +1,9 @@
 import React, {useState, useContext} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {UserContext} from '../Context/UserContext'
 import {FirebaseContext} from '../Context/FirebaseContext'
-import styled from 'styled-components'
 import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default  RegisterScreen = ({navigation}) => { 
     
