@@ -125,28 +125,30 @@ const Firebase = {
   },
 
   logOut: async () => {
-    signOut(auth).then(() => {
-      // Sign-out successful.
-    }).catch((error) => {
-      // An error happened.
-    });
+    try {
+      await AsyncStorage.removeItem('authToken'); // Supprimer le jeton d'authentification
+      await signOut(auth); // Déconnexion avec Firebase Auth
+    } catch (error) {
+      console.log("Error @logOut: ", error.message);
+      throw error;
+    }
   },
+  
 
   signIn: async (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        const token = user.accessToken;
-        AsyncStorage.setItem('userToken', token);
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-      });
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const token = user.accessToken;
+      await AsyncStorage.setItem('authToken', token); // Stocker le jeton dans AsyncStorage
+      return user;
+    } catch (error) {
+      // Gérer les erreurs ici
+      console.log("Error @signIn: ", error.message);
+      throw error;
+    }
   },
+  
 
   uploadPhotoAsync: async (uri, filename) => {
     return new Promise(async (res, rej) => {

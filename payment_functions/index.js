@@ -6,8 +6,14 @@ admin.initializeApp();
 
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   try {
+    if (!context.auth || !context.auth.token.email) {
+      throw new functions.https.HttpsError("unauthenticated", "Utilisateu ");
+    }
+
+    const userEmail = context.auth.token.email;
+
     const customer = await stripe.customers.create({
-      email: "customer@example.com",
+      email: userEmail,
     });
 
     const ephemeralKey = await stripe.ephemeralKeys.create(

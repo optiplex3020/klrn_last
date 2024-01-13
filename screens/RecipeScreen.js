@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, withSpring, } from 'react-native-reanimated';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
@@ -16,6 +17,17 @@ const RecipeScreen = () => {
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = usePaymentSheet();
+
+  const [success, setSuccess] = useState(false);
+
+  // Créer une valeur animée pour l'opacité
+  const opacity = useSharedValue(0);
+
+  // Créer une valeur animée pour la translation
+  const translateY = useSharedValue(-50);
+
+  // Créer une valeur animée pour l'échelle
+  const scale = useSharedValue(0.5);
 
   useEffect(() => {
     updatePaymentSheet();
@@ -37,11 +49,37 @@ const RecipeScreen = () => {
         Alert.alert(`Code d'erreur : ${error.code}`, error.message);
       } else {
         setReady(true);
+        setSuccess(true); // Déclencher l'animation de succès
+
       }
     } catch (error) {
       console.error('Erreur d\'initialisation de la feuille de paiement :', error);
     }
   };
+
+  useEffect(() => {
+    if (success) {
+      // Animer l'opacité, la translation et l'échelle avec des timings et des ressorts
+      opacity.value = withTiming(1, { duration: 500 });
+      translateY.value = withSpring(0, { stiffness: 200, damping: 20 });
+      scale.value = withSpring(1, { stiffness: 200, damping: 20 });
+    }
+  }, [success]);
+
+  // Créer un style animé pour le conteneur de confirmation
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [
+        {
+          translateY: translateY.value,
+        },
+        {
+          scale: scale.value,
+        },
+      ],
+    };
+  });
 
   const customAppearance = {
     font: {
@@ -166,7 +204,7 @@ const RecipeScreen = () => {
     </View>
   );
 
-  const STRIPE_PUBLISHABLE_KEY="pk_test_51NHsDFIldimfBY6spENLai4aCsTqrxyl8DljQturL8NCPrb2DBWbMkPKZyXm13IDjDEystKq7okgGmDcWw3D3onQ00SXIJd1Fy";
+  const STRIPE_PUBLISHABLE_KEY="pk_live_51NHsDFIldimfBY6sVhbIjpv4YRu5srhfFolF3tDpO2MorXH7qk7RpLx0MMsMmQURyRLOKJkIXwrcfLTRymUcWq8G00GFwgRXEW";
 
   return (
 
@@ -237,6 +275,15 @@ const RecipeScreen = () => {
             primaryButtonTitle={'Utiliser cette adresse'}
             sheetTitle={'Adresse de livraison'}
           />
+
+          {/* ... votre code existant */}
+      {success && (
+        <Animated.View
+          style={[/* Style pour le conteneur de confirmation */, animatedStyle]}
+        >
+          <Text>Paiement réussi !</Text>
+        </Animated.View>
+      )}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
           
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
@@ -260,6 +307,7 @@ const RecipeScreen = () => {
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>
+
       </View>
     </StripeProvider>
     
@@ -269,9 +317,10 @@ const RecipeScreen = () => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f7f7f7',
   },
+
   mainDark: {
     backgroundColor: '#000',
   },
@@ -374,9 +423,14 @@ const styles = StyleSheet.create({
     color: "black"
   },
   emptyCartMessage: {
-    justifyContent: 'center',
-    alignContent: "center",
-    alignItems: 'center',
+    textAlign: 'center',
+  },
+  // Ajoutez des styles pour le mode sombre si nécessaire
+  mainDark: {
+    backgroundColor: '#000', // Fond sombre
+  },
+  emptyCartMessageDark: {
+    color: '#FFF', // Texte en mode sombre
   },
   emptyCartMessageDark: {
     color: "white"

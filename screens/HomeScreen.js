@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableWithoutFeedback, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, View, Dimensions, SafeAreaView, Modal, TouchableOpacity, FlatList, ScrollView, Image,  Pressable, Animated } from 'react-native';
 import firebase from 'firebase/compat/app';
 import * as Animatable from 'react-native-animatable';  
-import { AntDesign } from '@expo/vector-icons';
 import { ThemeContext } from '../Context/ThemeContext';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
@@ -95,7 +93,6 @@ const HomeScreen = ({ navigation }) => {
       imageRef.current.fadeIn(); // Assurez-vous que imageRef est correctement référencé
     }
   };
-  
   
   const hideCategoryItems = () => {
     setSelectedCategory(null);

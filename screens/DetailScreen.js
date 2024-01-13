@@ -99,12 +99,6 @@ export default DetailScreen = ({ route, navigation }) => {
           iconStyle={{color: "#fff"}}
           rightButtonBackgroundColor={"#000"}
           leftButtonBackgroundColor={"#000"} />
-        
-        {showMessage && (
-          <View style={styles.alertContainer}>
-            <Text style={styles.alertText}>Produit ajouté au panier!</Text>
-          </View>
-        )}
 
         <Modal
           animationType="slide"
@@ -249,6 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalView: {
     margin: 20,
