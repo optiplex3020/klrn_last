@@ -15,26 +15,22 @@ const BottomTabNavigator = () => {
 
     return(
         <Tab.Navigator 
-            tabBarOptions={{
-                showLabel: false,
-                style: {
-                    position: 'absolute',
-                    bottom:  25,
-                    left: 20,
-                    right: 20,
-                    elevation: 0,
-                    backgroundColor: isDarkMode ? '#000' : '#f7f7f7', 
-                    borderRadius: 55,
-                    height: 90
-                }
-            }}
             screenOptions={{
+                tabBarShowLabel: false,
+                tabBarStyle: {
+                    display: "flex",
+                    position: 'absolute',
+                    left: 10,
+                    right: 10,
+                    elevation: 0,
+                    backgroundColor: isDarkMode ? '#000' : '#fff', 
+                    height: 60
+                },
                 style:{
                     height:65,
                     justifyContent:"center",
                     paddingVertical:15,
                     backgroundColor: isDarkMode ? '#000' : '#eff4f0', 
-                    elevation:2
                 }
             }}
         >
@@ -59,7 +55,7 @@ const BottomTabNavigator = () => {
                         )
                 }}
             />
-
+    
             <Tab.Screen
                 name="Recipe"
                 component={RecipeScreen}
@@ -83,6 +79,7 @@ const BottomTabNavigator = () => {
             />
         </Tab.Navigator>
     );
+    
 };
 const customTransition = {
     gestureDirection: 'vertical',

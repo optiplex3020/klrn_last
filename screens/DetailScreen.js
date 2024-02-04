@@ -15,6 +15,7 @@ export default DetailScreen = ({ route, navigation }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
+  
 
 
   const handleAddToCart = (item, quantity) => {
@@ -36,9 +37,6 @@ export default DetailScreen = ({ route, navigation }) => {
     }).start();
   }, []);
 
-  const closeModal = () => {
-    setModalVisible(false);
-  };
 
   const goToHome = () => {
     setModalVisible(false);
@@ -83,9 +81,8 @@ export default DetailScreen = ({ route, navigation }) => {
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.title}</Text>
         </View>
 
-        {/* Location text */}
-        <Text style={{ fontSize: 16, color: '#66666' }}>{item.lieu}</Text>
-        <Text style={{ marginTop: 20, color: '#666666' }}>{item.text}</Text>
+        <Text style={{ fontSize: 16, color: 'black' }}>{item.lieu}</Text>
+        <Text style={{ marginTop: 20, color: 'grey' }}>{item.text}</Text>
 
         <NumericInput 
           value={value}
@@ -222,7 +219,7 @@ const styles = StyleSheet.create({
   },
   facilityText: { 
     marginLeft: 5, 
-    color: '#666666' 
+    color: 'grey' 
   },
   alertContainer: {
     top: 20,

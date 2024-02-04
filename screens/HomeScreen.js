@@ -408,7 +408,8 @@ const styles = StyleSheet.create({
       width: 1200, 
       height: 2300,
     },
-    shadowOpacity: 450
+    shadowOpacity: 450,
+    backgroundColor: '#fff', 
   },
   cardDark: {
     borderColor: '#666',
