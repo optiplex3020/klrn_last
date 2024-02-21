@@ -11,12 +11,13 @@ export default AppStackScreens = () => {
 
   return (
     <AppStack.Navigator screenOptions={{ headerShown: false }}>
-      {user.isAuthenticated === false ? (
-        <AppStack.Screen name="Loading" component={LoadingScreen} />
+      {user.isAuthenticated === true ? (
+        <AppStack.Screen name="SplashStack" component={FirstStackScreens} />  
       ) : user.isAuthenticated ? (
-        <AppStack.Screen name="Main" component={MainStackScreens} />
+
+        <AppStack.Screen name="Loading" component={LoadingScreen} />
       ) : (
-        <AppStack.Screen name="SplashStack" component={FirstStackScreens} />      
+        <AppStack.Screen name="Main" component={MainStackScreens} />
       )
       }
     </AppStack.Navigator>

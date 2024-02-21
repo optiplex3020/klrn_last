@@ -4,33 +4,33 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import FirebaseKeys from '../firebase/config';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword } from "firebase/auth";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 const FirebaseContext = createContext();
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(FirebaseKeys);
-} else {
-  firebase.app(); // if already initialized, use that one
-}
+
 
 function onAuthStateChange() {
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
       // L'utilisateur est connecté, vous pouvez enregistrer des données d'authentification
-      await AsyncStorage.setItem('authToken', 'token_d_utilisateur');
+      await ReactNativeAsyncStorage.setItem('authToken', 'token_d_utilisateur');
       console.log("L'utilisateur est connecté");
     } else {
       // L'utilisateur est déconnecté, vous pouvez supprimer les données d'authentification
-      await AsyncStorage.removeItem('authToken');
+      await ReactNativeAsyncStorage.removeItem('authToken');
       console.log("L'utilisateur est déconnecté");
     }
   });
 }
 
+const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(FirebaseKeys);
 
 const db = firebase.firestore();
-const auth = getAuth();
+const auth = initializeAuth(firebaseApp, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
 const Firebase = {
   getCurrentUser: () => {
@@ -39,7 +39,7 @@ const Firebase = {
 
   createUser: async (user) => {
     try {
-      await createUserWithEmailAndPassword(auth, user.email, user.password)
+      await createUserWithEmailAndPassword(getAuth, user.email, user.password)
         .then((userCredential) => {
           // Signed in 
           const user = userCredential.user;
@@ -126,7 +126,7 @@ const Firebase = {
 
   logOut: async () => {
     try {
-      await AsyncStorage.removeItem('authToken'); // Supprimer le jeton d'authentification
+      await ReactNativeAsyncStorage.removeItem('authToken'); // Supprimer le jeton d'authentification
       await signOut(auth); // Déconnexion avec Firebase Auth
     } catch (error) {
       console.log("Error @logOut: ", error.message);
@@ -140,7 +140,7 @@ const Firebase = {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const token = user.accessToken;
-      await AsyncStorage.setItem('authToken', token); // Stocker le jeton dans AsyncStorage
+      await ReactNativeAsyncStorage.setItem('authToken', token); // Stocker le jeton dans AsyncStorage
       return user;
     } catch (error) {
       // Gérer les erreurs ici
