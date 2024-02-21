@@ -7,21 +7,26 @@ admin.initializeApp();
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   try {
     if (!context.auth || !context.auth.token.email) {
-      throw new functions.https.HttpsError("unauthenticated", "Utilisateu ");
+      throw new functions.https.HttpsError("unauthenticated", "user non auth");
     }
 
     const userEmail = context.auth.token.email;
 
-    const customer = await stripe.customers.create({
-      email: userEmail,
-    });
+    // Vérifier si le client existe déjà sur Stripe
+    let customer = await findStripeCustomerByEmail(userEmail);
+
+    if (!customer) {
+      // Si le client n'existe pas, créer un nouveau client sur Stripe
+      customer = await stripe.customers.create({
+        email: userEmail,
+      });
+    }
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
         {customer: customer.id},
         {apiVersion: "2023-10-16"});
 
     const cartTotal = calculateCartTotal(data.cart);
-
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cartTotal * 100,
@@ -45,4 +50,10 @@ const calculateCartTotal = (cart) => {
     const itemTotalPrice = item.prix * item.quantity;
     return total + itemTotalPrice;
   }, 0);
+};
+
+// Fonction pour rechercher un client Stripe par son adresse e-mail
+const findStripeCustomerByEmail = async (email) => {
+  const customers = await stripe.customers.list({email: email});
+  return customers.data.length > 0 ? customers.data[0] : null;
 };
