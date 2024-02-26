@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, Modal, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
-import NumericInput from 'react-native-numeric-input';
+import NumericInput from '../components/NumericInput';
 import { ThemeContext } from '../Context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 
@@ -67,7 +67,7 @@ export default DetailScreen = ({ route, navigation }) => {
         <ImageBackground style={styles.backgroundImage} source={{ uri: item.image }}>
           <View style={styles.header}>
             <View style={styles.headerBtn}>
-            <Ionicons name="arrow-back" size={20} onPress={navigation.goBack} /> 
+            <Ionicons name="arrow-back" size={20} color="black" onPress={navigation.goBack} /> 
             </View>
             <View style={styles.headerBtn}>
               <Ionicons name="heart" size={20} color={'#FF0000'} /> 
@@ -84,18 +84,13 @@ export default DetailScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, color: 'black' }}>{item.lieu}</Text>
         <Text style={{ marginTop: 20, color: 'grey' }}>{item.text}</Text>
 
-        <NumericInput 
-          value={value}
-          onChange={setValue}
-          minValue={1}
-          totalHeight={40}
-          totalWidth={100}
-          step={1}
-          maxValue={10}
-          rounded
-          iconStyle={{color: "#fff"}}
-          rightButtonBackgroundColor={"#000"}
-          leftButtonBackgroundColor={"#000"} />
+        <NumericInput
+        value={value}
+        onChange={setValue}
+        minValue={0}
+        maxValue={10}
+        step={1}
+      />
 
         <Modal
           animationType="slide"
