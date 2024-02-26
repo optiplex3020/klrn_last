@@ -8,7 +8,6 @@ const UserProvider = (props) => {
         username: "",
         email: "",
         uid: "",
-        isLoggedIn: null,
         isAuthenticated: null,
     });
 

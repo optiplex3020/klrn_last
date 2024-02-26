@@ -11,23 +11,6 @@ import { ThemeProvider } from './Context/ThemeContext';
 
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Vérifier si un token d'authentification est présent dans le stockage local
-    AsyncStorage.getItem('authToken')
-      .then((token) => {
-        if (token) {
-          // L'utilisateur est déjà authentifié, vous pouvez gérer cela ici
-          setIsAuthenticated(true);
-        }
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la récupération du jeton d\'authentification :', error);
-      });
-  }, []);
-  
-
   return (
     <ThemeProvider>
       <FirebaseProvider>

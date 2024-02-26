@@ -234,9 +234,7 @@ const RecipeScreen = () => {
             primaryButtonTitle={'Utiliser cette adresse'}
             sheetTitle={'Adresse de livraison'}
           />
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
           
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
           <TouchableOpacity
@@ -290,8 +288,7 @@ const styles = StyleSheet.create({
     color: "#fff"
   },
   flatListContainer: {
-    paddingVertical: 10,
-    width: '100%',
+    paddingVertical: 10
   },
   darkModeText: {
     color: "#fff"

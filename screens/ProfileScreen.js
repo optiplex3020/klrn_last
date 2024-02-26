@@ -2,59 +2,48 @@ import React, {useContext} from "react";
 import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {UserContext} from '../Context/UserContext'
 import {FirebaseContext} from '../Context/FirebaseContext'
-import { getAuth, signOut } from "firebase/compat/auth";
-
-
+import { ThemeContext } from '../Context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 export default  ProfileScreen = ({navigation}) => {
 
     const [user, setUser] = useContext(UserContext);
-    const firebase = useContext(FirebaseContext);
+    const { auth } = useContext(FirebaseContext); 
+    const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+    const firebase = useContext(FirebaseContext); 
 
-    const auth = getAuth();
-   
 
-    const logOut = () => {
-        signOut(auth).then(() => {
-            // Sign-out successful.
-    }).catch((error) => {
-      // An error happened.
-    });
-        
-    };
- const loggedOut =  logOut();
-        navigation.navigate('Auth')
+    console.log(auth); // Add this to debug
 
-        
-        if (loggedOut) {
-            setUser((state) => ({...state, isLoggenIn: false}));
+    const logOut = async () => {
+        try {
+            await firebase.logOut(); // Appel de la méthode logOut de FirebaseContext
+            setUser({ ...user, isAuthenticated: false }); // Mise à jour de l'état d'authentification dans UserContext
+            navigation.navigate('SplashStack'); // Redirection vers SplashStack après la déconnexion
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion :", error);
         }
+    };
+
     return(
 
         <View style={styles.container}>
             <View style={{marginTop: 214, alignItems: "center" }}>
-              <Text style={styles.name}>{user.username}</Text>
-            </View>  
-            <View style={styles.subContainer}>
-                <View style={styles.stat}>
-                    <Text style={styles.Amount}>21</Text>
-                    <Text style={styles.Title}>Plats</Text>  
-                </View>
-                <View style={styles.stat}>
-                    <Text style={styles.Amount}>242</Text>
-                    <Text style={styles.Title}>Abonnés</Text>  
-                </View>
-                <View style={styles.stat}>
-                    <Text style={styles.Amount}>242</Text>
-                    <Text style={styles.Title}>Abonnements</Text>  
-                </View>
-            </View>   
-            <View>
                 <TouchableOpacity onPress={logOut}>
                     <Text>
                         Déconnexion
                     </Text>
                 </TouchableOpacity>
-            </View>
+                <TouchableOpacity style={[styles.menuItem, isDarkMode && styles.menuItemDark]} onPress={toggleDarkMode}>
+                    <Ionicons
+                      name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+                      size={24}
+                      color={isDarkMode ? 'white' : 'black'} // Changez la couleur en fonction du mode sombre
+                    />
+                    <Text style={[styles.menuText, isDarkMode && styles.menuTextDark]}>
+                      Mode {isDarkMode ? 'clair' : 'sombre'}
+                    </Text>
+                  </TouchableOpacity>
+            </View>     
         </View>
     
         );
@@ -86,35 +75,15 @@ export default  ProfileScreen = ({navigation}) => {
         fontWeight: "bold",
         alignContent: "center"
     },
-    subContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        margin: 32,
-    },
-    
-    stat: {
-        alignItems:"center",
-        flex: 1,
-    },
-    
-    info: {
-        color: "#4F566D",
-        fontSize: 18,
-        fontWeight: "300"
-    },
-    
-    Title: {
-        color: "#C3C5CD",
-        fontSize: 12,
-        fontWeight: "500",
-        marginTop: 4
-    },
-    Amount: {
-        color: "#000",
-        fontSize: 18,
-        fontWeight: "600"
-    
-    }
+    menuItem: {
+        marginTop: '5%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+      },
+      menuItemDark: {
+        backgroundColor: '#000', 
+      },
     
     });
     

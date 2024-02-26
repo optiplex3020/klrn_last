@@ -8,6 +8,7 @@ import { FontAwesome5 } from '@expo/vector-icons'
 import { createStackNavigator } from '@react-navigation/stack';
 import { ThemeContext } from '../Context/ThemeContext'; 
 import { TransitionSpecs, HeaderStyleInterpolators } from '@react-navigation/stack';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
@@ -20,11 +21,11 @@ const BottomTabNavigator = () => {
                 tabBarStyle: {
                     display: "flex",
                     position: 'absolute',
-                    left: 10,
-                    right: 10,
                     elevation: 0,
                     backgroundColor: isDarkMode ? '#000' : '#fff', 
-                    height: 60
+                    height: 80,
+                    elevation:2
+
                 },
                 style:{
                     height:65,
@@ -59,6 +60,28 @@ const BottomTabNavigator = () => {
             <Tab.Screen
                 name="Recipe"
                 component={RecipeScreen}
+                options={{
+                    headerShown: false,
+                    tabBarLabel:"",
+                    tabBarIcon: ({ focused }) => (
+                        <View style={{
+                            position: 'absolute',
+                            top: '50%',
+                            
+                        }}>
+                            <FontAwesome5
+                                name="shopping-cart"
+                                size={20}
+                                color={focused ? '#009387' : 'grey'} />
+                        </View>
+                    
+                    )
+                }}
+            />
+
+            <Tab.Screen
+                name="Profile"
+                component={ProfileScreen}
                 options={{
                     headerShown: false,
                     tabBarLabel:"",
