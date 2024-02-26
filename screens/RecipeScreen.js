@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, Platform, SafeAreaView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { incrementQuantity, decrementQuantity, removeFromCart } from '../redux/reducers/cartSlice';
 import { FontAwesome } from '@expo/vector-icons';
@@ -168,7 +168,7 @@ const RecipeScreen = () => {
   return (
 
     <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme='fr.airlibre.kolia'>
-      <View style={[styles.main, isDarkMode && styles.mainDark]}>
+      <SafeAreaView style={[styles.main, isDarkMode && styles.mainDark]}>
           <View style={[styles.header, isDarkMode && styles.headerDark]}>
             <Text style={[styles.title, isDarkMode && styles.titleDark]}>Panier</Text>
           </View>
@@ -234,7 +234,9 @@ const RecipeScreen = () => {
             primaryButtonTitle={'Utiliser cette adresse'}
             sheetTitle={'Adresse de livraison'}
           />
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
           
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
           <TouchableOpacity
@@ -255,7 +257,7 @@ const RecipeScreen = () => {
           >
             <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
           </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </StripeProvider>
     
   );
@@ -271,7 +273,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    backgroundColor: '#fff',
     width: '100%',
     height: '12%',
     alignItems: 'center'
@@ -288,7 +289,8 @@ const styles = StyleSheet.create({
     color: "#fff"
   },
   flatListContainer: {
-    paddingVertical: 10
+    paddingVertical: 10,
+    width: '100%',
   },
   darkModeText: {
     color: "#fff"
@@ -353,7 +355,7 @@ const styles = StyleSheet.create({
     width: "90%",
     backgroundColor: "#000",
     alignItems: "center",
-    marginBottom: '7%',
+    marginBottom: '15%',
     shadowOpacity: 4,
     shadowColor: "green",
     shadowOffset: {width: 500, height: 5},
