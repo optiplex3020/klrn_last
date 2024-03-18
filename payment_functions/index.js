@@ -9,7 +9,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     if (!context.auth || !context.auth.token.email) {
       throw new functions.https.HttpsError("unauthenticated", "user non auth");
     }
-
+    const addressDetails = data.address;
     const userEmail = context.auth.token.email;
 
     // Vérifier si le client existe déjà sur Stripe
@@ -26,13 +26,26 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
         {customer: customer.id},
         {apiVersion: "2023-10-16"});
 
+    const orderRef = admin.firestore().collection("orders").doc();
     const cartTotal = calculateCartTotal(data.cart);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cartTotal * 100,
+      metadata: {orderId: orderRef.id},
       currency: "eur",
       automatic_payment_methods: {enabled: true},
-      customer: customer.id});
+      customer: customer.id,
+    });
+
+    await orderRef.set({
+      userId: context.auth.uid,
+      items: data.cart, // Les détails du panier passés à la fonction
+      shippingDetails: addressDetails,
+      paymentIntentId: paymentIntent.id,
+      paymentStatus: "Pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
 
     return {
       ephemeralKey: ephemeralKey.secret,
@@ -57,3 +70,39 @@ const findStripeCustomerByEmail = async (email) => {
   const customers = await stripe.customers.list({email: email});
   return customers.data.length > 0 ? customers.data[0] : null;
 };
+const endpointSe = functions.config().stripe.webhooksecret.trim();
+
+exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+  try {
+    const sig = req.headers["stripe-signature"];
+
+    const event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSe);
+
+    // Traitez l"événement
+    switch (event.type) {
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object;
+        // Récupérez l'ID de commande correspondant à cet intent de paiement
+        const orderId = paymentIntent.metadata.orderId;
+        // Mettez à jour le document de commande dans Firestore
+        const orderRef = admin.firestore().collection("orders").doc(orderId);
+        await orderRef.update({
+          paymentStatus: "Succeeded",
+        });
+
+        console.log(`Pay de ${paymentIntent.amount} réussi et statut update`);
+        break;
+      }
+      // Gérez d"autres types d"événements si nécessaire
+      default: {
+        console.log(`Type d"événement inconnu: ${event.type}`);
+      }
+    }
+
+    res.status(200).send("Événement reçu");
+  } catch (err) {
+    console.error(`Erreur webhook: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
+

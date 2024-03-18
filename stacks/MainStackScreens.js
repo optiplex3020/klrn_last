@@ -88,11 +88,10 @@ const BottomTabNavigator = () => {
                     tabBarIcon: ({ focused }) => (
                         <View style={{
                             position: 'absolute',
-                            top: '50%',
-                            
+                            top: '50%'
                         }}>
                             <FontAwesome5
-                                name="shopping-cart"
+                                name="user"
                                 size={20}
                                 color={focused ? '#009387' : 'grey'} />
                         </View>
@@ -100,6 +99,8 @@ const BottomTabNavigator = () => {
                     )
                 }}
             />
+                    
+                
         </Tab.Navigator>
     );
     

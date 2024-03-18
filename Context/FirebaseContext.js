@@ -6,6 +6,7 @@ import FirebaseKeys from '../firebase/config';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { getFirestore } from 'firebase/firestore';
 
 const FirebaseContext = createContext();
 
@@ -28,6 +29,7 @@ function onAuthStateChange() {
 const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(FirebaseKeys);
 
 const db = firebase.firestore();
+export const dbb = getFirestore(firebaseApp);
 const auth = initializeAuth(firebaseApp, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });

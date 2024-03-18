@@ -1,8 +1,10 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image, SafeAreaView, StatusBar, Pressable, TouchableOpacity, } from 'react-native'
+import { StyleSheet, Text, View, Image, SafeAreaView, StatusBar, Dimensions, TouchableOpacity, } from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable'
+
+const { width, height } = Dimensions.get('window');
 
 
 export default FirstScreen = ({navigation}) => {
@@ -28,24 +30,24 @@ export default FirstScreen = ({navigation}) => {
           <View style={{paddingHorizontal: 20, paddingTop: 20}}>
             {/* Title container */}
             <View>
-              <Text style={style.title}>Voyager depuis</Text>
+              <Text style={style.title}>Voyagez depuis</Text>
               <Text style={style.title}>votre assiette</Text>
             </View>
     
             {/* Text container */}
             <View style={{marginTop: 10}}>
               <Text style={style.textStyle}>
-                Embarquer pour de nouvelles saveurs
+                Embarquez pour de nouvelles saveurs
               </Text>
               <Text style={style.textStyle}>en seulement quelques clics</Text>
             </View>
           </View>
-          <View style={{ flex: 1, marginTop: 20 }}>
+          <View style={{ flex: 1, marginTop: "5%" }}>
             <Animatable.View
               animation="bounceIn" 
               duration={500} 
               delay={200} 
-              style={{ flex: 1, paddingBottom: 40 }}
+              style={{ flex: 1, paddingBottom: "10%" }}
             >
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <View style={style.btn}>
@@ -66,13 +68,13 @@ export default FirstScreen = ({navigation}) => {
     const style = StyleSheet.create({
       image: {
         marginTop: -50,
-        height: '65%',
+        height: height * 0.6, // 65% de la hauteur de l'écran
         width: '100%',
         borderBottomLeftRadius: 100,
       },
       btn: {
         height: 60,
-        marginHorizontal: 20,
+        marginHorizontal: width * 0.05, // 5% de la largeur de l'écran
         backgroundColor: '#009387',
         borderRadius: 15,
         justifyContent: 'center',
@@ -81,7 +83,7 @@ export default FirstScreen = ({navigation}) => {
       },
       btn2: {
         height: 60,
-        marginHorizontal: 20,
+        marginHorizontal: width * 0.05, // 5% de la largeur de l'écran
         backgroundColor: 'white',
         borderRadius: 15,
         borderColor: '#009387',

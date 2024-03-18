@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { ImageBackground, SafeAreaView, View, Text, FlatList, StyleSheet, Modal, Dimensions, TouchableOpacity, Animated } from 'react-native';
+import { ImageBackground, SafeAreaView, View, Text, StyleSheet, Modal, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/reducers/cartSlice';
 import NumericInput from '../components/NumericInput';
 import { ThemeContext } from '../Context/ThemeContext';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons'; 
 
 
 

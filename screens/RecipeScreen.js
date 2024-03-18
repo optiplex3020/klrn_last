@@ -13,6 +13,7 @@ const RecipeScreen = () => {
   const [ready, setReady] = useState(false);
   const [addressSheetVisible, setAddressSheetVisible] = useState(false);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const [addressDetails, setAddressDetails] = useState(null);
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = usePaymentSheet();
@@ -20,6 +21,36 @@ const RecipeScreen = () => {
   useEffect(() => {
     updatePaymentSheet();
   }, [cartItems]);
+
+  // Appelez cette fonction lorsque l'utilisateur soumet son adresse
+  const handleAddressSubmit = async (details) => {
+    setAddressDetails(details); // Enregistrez les détails pour une utilisation ultérieure
+    setAddressSheetVisible(false); // Fermez la feuille d'adresse
+
+    // Continuez avec la feuille de paiement
+    await initializePaymentSheetWithAddress(details);
+  };
+
+  const initializePaymentSheetWithAddress = async (addressDetails) => {
+    try {
+      const { ephemeralKey, paymentIntent } = await fetchPaymentSheetParams(addressDetails);
+      const { error } = await initPaymentSheet({
+        ephemeralKey: ephemeralKey,
+        paymentIntentClientSecret: paymentIntent,
+        merchantDisplayName: 'KoLia Fr',
+        // Ajoutez les détails de l'adresse ici
+        defaultShippingDetails: addressDetails,
+      });
+
+      if (error) {
+        console.error('Erreur lors de l’initialisation de la feuille de paiement', error);
+      } else {
+        setReady(true); // Ici, vous pouvez définir l'état pour indiquer que la feuille de paiement est prête à être présentée
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des paramètres de la feuille de paiement:', error);
+    }
+  };
 
   const updatePaymentSheet = async () => {
     try {
@@ -71,7 +102,6 @@ const RecipeScreen = () => {
    };
 
   const buy = async () => {
-    setAddressSheetVisible(true);
 
     try {
 
@@ -88,9 +118,12 @@ const RecipeScreen = () => {
     }
   };
   
-  const fetchPaymentSheetParams = async () => {
+  const fetchPaymentSheetParams = async (addressDetails) => {
     try {
-      const response = await firebase.functions().httpsCallable('createPaymentIntent')({ cart: cartItems }); // Envoyer le panier à la fonction Cloud Functions
+      const response = await firebase.functions().httpsCallable('createPaymentIntent')({
+        cart: cartItems,
+        address: addressDetails // Assurez-vous que cette information est correctement fournie
+      });
       const data = response.data;
   
       return {
@@ -101,7 +134,7 @@ const RecipeScreen = () => {
       console.error('Erreur lors de la récupération des paramètres de la feuille de paiement:', error);
       throw error;
     }
-  };
+  };  
   
   const handleIncrement = (itemId) => {
     dispatch(incrementQuantity(itemId));
@@ -186,27 +219,7 @@ const RecipeScreen = () => {
           )}
           <AddressSheet
             visible={addressSheetVisible}
-            onSubmit={async (addressDetails) => {
-              setAddressSheetVisible(false);
-              try {
-                const { paymentIntent, ephemeralKey } = await fetchPaymentSheetParams();
-                const { error } = await initPaymentSheet({
-                  defaultShippingDetails: addressDetails,
-                  appearance: customAppearance,
-                  customerEphemeralKeySecret: ephemeralKey,
-                  paymentIntentClientSecret: paymentIntent,
-                  merchantDisplayName: 'KoLia Fr',
-                  allowsDelayedPaymentMethods: true,
-                });
-                if (error) {
-                  console.error('Erreur lors de la configuration de la feuille de paiement :', error);
-                } else {
-                  setReady(true);
-                }
-              } catch (error) {
-                console.error('Erreur lors de la configuration de la feuille de paiement :', error);
-              }
-            }}
+            onSubmit={handleAddressSubmit}
             onError={(error) => {
               if (error.code === AddressSheetError.Failed) {
                 Alert.alert('Une erreur s\'est produite.', 'Veuillez vérifier les journaux pour plus de détails.');
@@ -239,24 +252,43 @@ const RecipeScreen = () => {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
           
           <Text style={[styles.totalPrice, isDarkMode && styles.totalPriceDark]}>Prix total: {calculateTotalPrice(cartItems)}€</Text>
-          <TouchableOpacity
-            style={[
-              styles.paymentButton,
-              isDarkMode && styles.paymentButtonDark,
-              {
-                shadowColor: isDarkMode ? 'white' : 'black',
-                shadowOffset: { width: 1, height: 3 },
-                shadowOpacity: 0.5,
-                shadowRadius: 2,
-                elevation: 3, 
-                opacity: !ready ? 0.5 : 1,
-                backgroundColor: !ready ? '#ccc' : '#000', },
-            ]}
-            onPress={buy}
-            disabled={!ready} 
-          >
-            <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
+          {/* Bouton pour ouvrir la feuille d'adresse */}
+          <TouchableOpacity style={[
+                styles.paymentButton,
+                isDarkMode && styles.paymentButtonDark,
+                {
+                  shadowColor: isDarkMode ? 'white' : 'black',
+                  shadowOffset: { width: 1, height: 3 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 2,
+                  elevation: 3, 
+                  opacity: !ready ? 0.5 : 1,
+                  backgroundColor: !ready ? '#ccc' : '#000', },
+              ]}
+              onPress={() => setAddressSheetVisible(true)}>
+            <Text>Ajouter une adresse de livraison</Text>
           </TouchableOpacity>
+          {ready && (
+            <TouchableOpacity
+              style={[
+                styles.paymentButton,
+                isDarkMode && styles.paymentButtonDark,
+                {
+                  shadowColor: isDarkMode ? 'white' : 'black',
+                  shadowOffset: { width: 1, height: 3 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 2,
+                  elevation: 3, 
+                  opacity: !ready ? 0.5 : 1,
+                  backgroundColor: !ready ? '#ccc' : '#000', },
+              ]}
+              onPress={buy}
+              disabled={!ready} 
+            >
+              <Text style={[styles.paymentButtonText, isDarkMode && styles.paymentButtonTextDark]}>Payer</Text>
+            </TouchableOpacity>
+          )}
+
       </SafeAreaView>
     </StripeProvider>
     

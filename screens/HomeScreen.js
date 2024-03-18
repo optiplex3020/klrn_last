@@ -177,7 +177,7 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.view, isDarkMode && styles.viewDark]} showsVerticalScrollIndicator={false} bounces={false} >
       <SafeAreaView style={[styles.container, isDarkMode && styles.containerDark]}>
         <View style={[styles.header, isDarkMode && styles.headerDark]}>
           <Text style={[styles.appName, isDarkMode && styles.appNameDark]}>Kolia</Text>

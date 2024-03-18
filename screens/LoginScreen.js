@@ -154,83 +154,75 @@ const Loading = styled.ActivityIndicator.attrs(props => ({
         size: "small"
     }))``;
     
+    const { width, height } = Dimensions.get('window');
 
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            backgroundColor: '#000'
-        },
-        header: {
-            flex: 1,
-            justifyContent: 'flex-end',
-            paddingHorizontal: 20,
-            paddingVertical: 50,
-        },
-        back: {
-            position: "absolute",
-            top: 50,
-            left: 25,
-            width: 50,
-            height: 50,
-            borderRadius: 16,
-            backgroundColor: "transparent",
-            alignItems: "center",
-            justifyContent: "center"
-        },
-        footer: {
-            flex: 3,
-            backgroundColor:'#fff',
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            paddingVertical: 20,
-            paddingHorizontal: 30,
-        
-        },
-        text_header: {
-            color: '#fff',
-            fontWeight: 'bold',
-            fontSize: 30
-        },
-        text_footer: {
-            color: '#05375a',
-            fontSize: 18
-        },
-        action: {
-            flexDirection: 'row',
-            marginTop: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: '#f2f2f2',
-            paddingBottom: 5
-        },
-        textInput: {
-            flex: 1,
-            marginTop: Platform.OS === 'ios' ? 0 : -12,
-            paddingLeft: 10,
-            color: "#05375a"
-        },
-        button: {
-            alignItems: 'center',
-            marginTop: "auto",
-            
-        },
-        signIn: {
-            width: "100%",
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-        },
-        textSign: {
-            fontSize: 18,
-            color: "#fff"
-        },
-        button_o: {
-            marginHorizontal: 5,
-            backgroundColor: "#009387",
-            marginTop: "30%",
-            borderRadius: 10,
-            alignItems: "center",
-            height: 52,
-            justifyContent: "center",
-        },
-    })
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#000'
+    },
+    header: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      paddingHorizontal: 20,
+      paddingVertical: height * 0.07, // Dynamique selon la hauteur
+    },
+    back: {
+      position: "absolute",
+      top: height * 0.05, // Dynamique
+      left: width * 0.05, // Dynamique
+      width: 50,
+      height: 50,
+      borderRadius: 16,
+      backgroundColor: "transparent",
+      alignItems: "center",
+      justifyContent: "center"
+    },
+    footer: {
+      flex: 3,
+      backgroundColor: '#fff',
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+      paddingVertical: 20,
+      paddingHorizontal: 30,
+    },
+    text_header: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: width * 0.08, // Dynamique selon la largeur
+    },
+    text_footer: {
+      color: '#05375a',
+      fontSize: width * 0.045, // Dynamique
+    },
+    action: {
+      flexDirection: 'row',
+      marginTop: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f2f2f2',
+      paddingBottom: 5
+    },
+    textInput: {
+      flex: 1,
+      marginTop: Platform.OS === 'ios' ? 0 : -12,
+      paddingLeft: 10,
+      color: "#05375a",
+    },
+    button: {
+      alignItems: 'center',
+      marginTop: "auto",
+    },
+    textSign: {
+      fontSize: width * 0.045, // Dynamique
+      color: "#fff"
+    },
+    button_o: {
+      marginHorizontal: 5,
+      backgroundColor: "#009387",
+      marginTop: "30%",
+      borderRadius: 10,
+      alignItems: "center",
+      height: 52,
+      justifyContent: "center",
+    },
+  });
