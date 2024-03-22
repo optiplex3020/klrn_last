@@ -85,12 +85,12 @@ export default DetailScreen = ({ route, navigation }) => {
         <Text style={{ marginTop: 20, color: 'grey' }}>{item.text}</Text>
 
         <NumericInput
-        value={value}
-        onChange={setValue}
-        minValue={0}
-        maxValue={10}
-        step={1}
-      />
+          value={value}
+          onChange={setValue}
+          minValue={0}
+          maxValue={10}
+          step={1}
+        />
 
         <Modal
           animationType="slide"
