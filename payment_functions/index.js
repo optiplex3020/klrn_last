@@ -33,7 +33,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       amount: cartTotal * 100,
       metadata: {orderId: orderRef.id},
       currency: "eur",
-      automatic_payment_methods: {enabled: true},
+      automatic_payment_methods: {enabled: false},
       customer: customer.id,
     });
 

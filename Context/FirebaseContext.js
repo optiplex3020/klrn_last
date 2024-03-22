@@ -39,63 +39,29 @@ const Firebase = {
     return auth.currentUser;
   },
 
-  createUser: async (user) => {
+  createUser: async (userData) => {
     try {
-      await createUserWithEmailAndPassword(getAuth, user.email, user.password)
-        .then((userCredential) => {
-          // Signed in 
-          const user = userCredential.user;
-          // ...
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // ..
-        });
-      const uid = Firebase.getCurrentUser().uid;
-
-      let profilePhotoUrl = "default";
-
+      const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+      const user = userCredential.user;
+      const token = await user.getIdToken(); // Obtenir le token d'identification
+      await ReactNativeAsyncStorage.setItem('authToken', token); // Stocker le jeton dans AsyncStorage
+      const uid = user.uid;
+  
+      // Utilisation correcte de userData pour stocker les informations supplémentaires
       await db.collection('users').doc(uid).set({
-        username: user.username,
-        email: user.email,
+        username: userData.username, // Utilisez userData pour accéder au nom d'utilisateur
+        email: user.email, // Utilisez user pour accéder à l'email
         uid: uid,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        profilePhotoUrl
       });
-
-      if (user.profilePhoto) {
-        profilePhotoUrl = await firebase.uploadProfilePhoto(user.profilePhoto);
-      }
-
-      delete user.password;
-
-      return { ...user, profilePhotoUrl, uid };
+  
+      return { ...userData, uid }; // Retournez l'objet userData enrichi avec uid
     } catch (error) {
       console.log("Error @createUser: ", error.message);
+      throw error; // Rethrow l'erreur pour une gestion ultérieure
     }
   },
-
-  uploadProfilePhoto: async (uri) => {
-    const uid = Firebase.getCurrentUser().uid;
-
-    try {
-      const photo = await Firebase.getBlob(uri);
-
-      const imageRef = firebase.storage().ref("avatars").child(uid);
-      await imageRef.put(photo);
-
-      const url = await imageRef.getDownloadURL();
-
-      await db.collection("users").doc(uid).update({
-        profilePhotoUrl: url,
-      });
-
-      return url;
-    } catch (error) {
-      console.log("Error @uploadProfilePhoto: ", error);
-    }
-  },
+  
 
   getBlob: async (uri) => {
     return await new Promise((resolve, reject) => {

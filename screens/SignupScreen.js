@@ -1,11 +1,10 @@
 import React, {useState, useContext} from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions, Button, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Alert } from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient';
-import { Feather, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import {UserContext} from '../Context/UserContext'
 import {FirebaseContext} from '../Context/FirebaseContext'
-//import firebase from "firebase/compat/app";
 
 export default SignupScreen = ({navigation}) => { 
 
@@ -24,31 +23,30 @@ export default SignupScreen = ({navigation}) => {
     });
 
     const signUp = async () => {
-      setLoading(true);
-  
-      if (!username || !email || !password) {
-          console.log("Error: username, email and password must not be empty");
-          Alert.alert("DFGH")
-          setLoading(false);
-          return;
-      }
-  
-      const user = {username, email, password};
-  
-      try {
-          const createdUser = await firebase.createUser(user)
-  
-          if (createdUser) {
-            setUser({ ...createdUser, isLoggedIn: true, isAuthenticated: true });
-          } else {
-              console.log("Error: User could not be created");
-          }
-      } catch (error) {
-          console.log("Error @signUp: ", error)
-      } finally {
-          setLoading(false)
-      }
-  };
+        setLoading(true);
+      
+        if (!username || !email || !password) {
+            console.log("Error: username, email, and password must not be empty");
+            setLoading(false);
+            return;
+        }
+      
+        try {
+            const user = { username, email, password };
+            const createdUser = await firebase.createUser(user);
+      
+            if (createdUser) {
+              setUser({ ...createdUser, isAuthenticated: true });
+            } else {
+                console.log("Error: User could not be created");
+            }
+        } catch (error) {
+            console.log("Error @signUp: ", error)
+        } finally {
+            setLoading(false);
+        }
+      };
+      
   
 
     const textInputChange = (val) => {
